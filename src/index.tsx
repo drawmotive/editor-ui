@@ -40,7 +40,7 @@ export function Editor({className,style,slots,colorScheme,onReady,onError,ui,...
       })).then(async()=>{if(instance)await instance.dispose();});
       void releasing.current.catch(error=>callbacks.current.onError?.(error));
     };
-  },[options.assetBaseUrl,options.textEditing,ui,options.persistence,options.workerFactory,options.workerUrls,options.signal,options.title,options.startupTimeoutMs,options.disposeTimeoutMs]);
+  },[options.assetBaseUrl,options.licenseKey,options.textEditing,ui,options.persistence,options.workerFactory,options.workerUrls,options.signal,options.title,options.startupTimeoutMs,options.disposeTimeoutMs]);
   return <div className={className} style={{position:'relative',width:'100%',height:'100%',...style}}>
     <div ref={runtime} style={{position:'absolute',inset:0}} />
     {editor&&<EditorUi options={ui} editor={editor} container={runtime.current!} slots={slots} colorScheme={colorScheme} onError={onError}/>}

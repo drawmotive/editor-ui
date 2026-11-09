@@ -4,10 +4,10 @@ Reusable drawing toolbars, selection properties, settings, help, tooltips and
 keyboard controls for the [DrawMotive canvas SDK](https://github.com/drawmotive/drawmotive).
 Use the React components or mount the same controls in an ordinary DOM host.
 
-The initial source and external-package checks use the real public
-`@drawmotive/editor@0.3.2` types and base canvas API. Its published native runtime
-does not provide this source's capsule, star and cloud tools. Full toolbar support
-requires the next coordinated Editor release. UI 0.3.2 will not be published;
+The committed lockfile retains the public `@drawmotive/editor@0.3.2` types and base
+canvas API. Its published native runtime does not provide this source's capsule,
+star and cloud tools or native licensing. Full toolbar and licensing support
+require the next coordinated Editor release. UI 0.3.2 will not be published;
 the first npm publication is planned for coordinated release 0.3.3. The current
 0.3.2 package identity is retained for registry fixture checks until that release
 is initialized. Editor 0.3.1 and earlier use a different
@@ -87,6 +87,13 @@ DOM and typography notifications, so keep the supported SDK version installed.
 `EditorUi` and `mountEditorUi()` accept `options`, `slots`, `colorScheme`,
 `className`, `style` and `onError`. The React `Editor` wrapper accepts the same UI
 configuration as `ui`, plus ordinary public editor creation options.
+With the matching SDK/native runtime, this includes the optional `licenseKey`
+deployment prop. Changing it disposes the previous native session before creating
+its successor. Bottom controls retain their original corner positions; native
+branding sits at the canvas bottom center and may overlap controls on narrow
+hosts. No branding text or license validation is implemented by this React package.
+See [Editor licensing](https://textgraph.dev/editor/licensing) for the optional
+official removal service and the SDK's immutable `getLicenseStatus()` snapshot.
 
 Options control button visibility, corner regions, drawing/context toolbars,
 tooltips and host actions. Slots contain host React elements. Host actions use
