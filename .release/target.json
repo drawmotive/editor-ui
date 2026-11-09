@@ -9,5 +9,5 @@
   },
   "native": false,
   "publishable": false,
-  "excludedReason": "Initial UI publication requires a coordinated Editor release with native constraint-shape tools."
+  "excludedReason": "Skip 0.3.2 publication; first npm publication is planned for coordinated release 0.3.3."
 }
