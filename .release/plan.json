@@ -8,5 +8,6 @@
     "@drawmotive/editor": "0.3.2"
   },
   "native": false,
-  "publishable": true
+  "publishable": false,
+  "excludedReason": "Skip 0.3.2 publication; first npm publication is planned for coordinated release 0.3.3."
 }

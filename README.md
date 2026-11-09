@@ -7,8 +7,10 @@ Use the React components or mount the same controls in an ordinary DOM host.
 The initial source and external-package checks use the real public
 `@drawmotive/editor@0.3.2` types and base canvas API. Its published native runtime
 does not provide this source's capsule, star and cloud tools. Full toolbar support
-requires an upcoming coordinated Editor release, so initial npm publication is
-blocked by the factual release target. Editor 0.3.1 and earlier use a different
+requires the next coordinated Editor release. UI 0.3.2 will not be published;
+the first npm publication is planned for coordinated release 0.3.3. The current
+0.3.2 package identity is retained for registry fixture checks until that release
+is initialized. Editor 0.3.1 and earlier use a different
 embedding API and are not supported. React and React DOM 19.3.1 are peers; Mantine
 9.7.4 and Phosphor 2.1.10 are package dependencies. The canvas SDK remains
 independent of React, Mantine and this package.
@@ -109,6 +111,22 @@ preferences. Hiding controls does not change native editing permissions or the
 SDK's `textEditing` policy.
 
 ## Development and verification
+
+In the DrawMotive integration checkout, use the joint development runner:
+
+```bash
+npm run dev:watch -- editor-ui --port 5180
+npm run dev:verify -- editor-ui
+npm run dev:watch -- all
+```
+
+It builds the current Editor C# working files, SDK and UI, serves their real
+native runtime, and rebuilds affected consumers after edits. The UI-only host
+uses port 5180 in this example. The `all` target also runs the documentation
+site and private diagrams app on consecutive ports starting at 5173. Local
+dependency links and development native assets stay separate from registry
+locks and release artifacts. Follow the integration checkout's `DEVELOPMENT.md`
+for prerequisites, output locations and shutdown recovery.
 
 Use Node.js 22 or later and npm. The committed lockfile resolves dependencies
 from the public registry, without a parent workspace.
