@@ -26,7 +26,9 @@
 .dm-editor-ui *,.dm-editor-ui *::before,.dm-editor-ui *::after {box-sizing:border-box;}
 .dm-editor-ui .dm-toolbar {margin:0;min-width:0;padding:2px;display:flex;align-items:center;gap:5px;border:1px solid var(--dm-border);border-radius:4px;background:var(--dm-surface);box-shadow:0 2px 6px #0002;pointer-events:auto;color:var(--dm-text);}
 .dm-editor-ui .dm-corner{position:absolute;max-width:calc(100% - 20px);flex-wrap:wrap;}
-.dm-topLeft{top:10px;left:10px}.dm-topRight{top:10px;right:10px}.dm-bottomLeft{bottom:10px;left:10px}.dm-bottomRight{bottom:10px;right:10px}
+.dm-topLeft{top:10px;left:10px}.dm-topRight{top:10px;right:10px}
+/* Leave the bottom canvas row clear for native screen branding and pointer input. */
+.dm-bottomLeft{bottom:34px;left:10px}.dm-bottomRight{bottom:34px;right:10px}
 .dm-editor-ui .dm-drawing{position:absolute;max-height:calc(100% - 90px);max-width:calc(100% - 100px);}
 .dm-drawing.dm-left{left:10px;top:70px;flex-direction:column}.dm-drawing.dm-right{right:10px;top:70px;flex-direction:column}
 .dm-drawing.dm-top{top:60px;left:50%;transform:translateX(-50%)}.dm-drawing.dm-bottom{bottom:60px;left:50%;transform:translateX(-50%)}

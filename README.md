@@ -6,7 +6,7 @@ Use the React components or mount the same controls in an ordinary DOM host.
 
 The initial source and external-package checks use the real public
 `@drawmotive/editor@0.3.2` types and base canvas API. Its published native runtime
-does not provide this source's capsule, star and cloud tools. Full toolbar support
+does not provide this source's capsule, star and cloud tools or native licensing. Full toolbar support
 requires an upcoming coordinated Editor release, so initial npm publication is
 blocked by the factual release target. Editor 0.3.1 and earlier use a different
 embedding API and are not supported. React and React DOM 19.3.1 are peers; Mantine
@@ -85,6 +85,12 @@ DOM and typography notifications, so keep the supported SDK version installed.
 `EditorUi` and `mountEditorUi()` accept `options`, `slots`, `colorScheme`,
 `className`, `style` and `onError`. The React `Editor` wrapper accepts the same UI
 configuration as `ui`, plus ordinary public editor creation options.
+With the matching SDK/native runtime, this includes the optional `licenseKey`
+deployment prop. Changing it disposes the previous native session before creating
+its successor. The bottom controls leave the native branding row clear; no
+branding text or license validation is implemented by this React package.
+See [Editor licensing](https://textgraph.dev/editor/licensing) for the optional
+official removal service and the SDK's immutable `getLicenseStatus()` snapshot.
 
 Options control button visibility, corner regions, drawing/context toolbars,
 tooltips and host actions. Slots contain host React elements. Host actions use
