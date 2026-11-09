@@ -1,0 +1,20 @@
+Material Symbols Outlined
+Copyright Google LLC.
+Licensed under the Apache License, Version 2.0.
+See MaterialSymbols-LICENSE.txt for the complete license.
+
+Upstream project: https://github.com/google/material-design-icons
+Upstream revision: 10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7
+
+SVG paths embedded in icons.tsx:
+- rounded_corner: user-supplied 24-unit SVG path.
+- line_style: outlined, 24px, default weight, unmodified upstream path.
+- line_end_arrow_notch: outlined, 24px, default weight, unmodified upstream path.
+- line_end_circle: outlined, fill=1, 24px, default weight, unmodified upstream path.
+- line_end_diamond: outlined, fill=1, 24px, default weight, unmodified upstream path.
+
+Source directory at the pinned revision:
+https://github.com/google/material-design-icons/tree/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/symbols/web
+
+Adaptations are limited to React SVG attributes, currentColor, display size and
+horizontal mirroring of endpoint icons. No upstream path geometry is redrawn.

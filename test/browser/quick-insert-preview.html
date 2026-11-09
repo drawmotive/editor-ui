@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quick insert preview</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/dist/quick-insert-preview.css">
+  <style>
+    body{margin:0;padding:24px;color:#41464f;background:#f4f5f7;font:14px/1.5 system-ui,sans-serif}
+    main{max-width:960px;margin:auto}h1{font-size:20px;margin:0 0 8px}
+    .preview-controls{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:16px 0}
+    .preview-controls label{display:flex;align-items:center;gap:6px}
+    .preview-controls select,.preview-controls button{font:inherit;padding:4px 8px}
+    .preview-stage{position:relative;max-width:100%;height:480px;border:1px solid #c8c8ce;background:#fff;background-image:radial-gradient(#d5d8df 1px,transparent 1px);background-size:16px 16px}
+    .preview-stage[data-theme=dark]{background-color:#202632;background-image:radial-gradient(#39424f 1px,transparent 1px)}
+    .drawmotive-canvas-host,.drawmotive-canvas-host canvas{position:absolute;inset:0;width:100%;height:100%}
+    .preview-help{font-size:12px;opacity:.8}
+    @media(max-width:400px){body{padding:8px}}
+  </style>
+</head>
+<body><div id="preview"></div><script type="module" src="/dist/quick-insert-preview.js"></script></body>
+</html>

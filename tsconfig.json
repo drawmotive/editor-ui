@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "lib":["ES2022","DOM"],"module":"Preserve","moduleResolution":"Bundler","target":"ES2022","jsx":"react-jsx","strict":true,"noEmit":true,"skipLibCheck":true },
+  "include":["src/**/*.tsx","src/css.d.ts","test/browser/quick-insert-preview.tsx"]
+}
