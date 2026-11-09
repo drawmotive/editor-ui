@@ -1,0 +1,53 @@
+name: Editor UI package contracts
+on:
+  push:
+    branches: ["**"]
+    tags-ignore: ["coordinated-artifact-*"]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+          cache: npm
+      - run: npm install --global npm@12.2.1
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      # This initial package is a consumption fixture, not a release candidate.
+      # test:package also proves that the ordinary prepack release gate rejects it.
+      - run: npm pack --ignore-scripts --json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editor-ui-npm-${{ matrix.os }}
+          path: "*.tgz"
+          if-no-files-found: error
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+          cache: npm
+      - run: npm install --global npm@12.2.1
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - run: npm run test:package
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: editor-ui-browser-failures
+          path: test-results/

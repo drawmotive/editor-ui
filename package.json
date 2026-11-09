@@ -1,0 +1,32 @@
+{
+  "name": "@drawmotive/editor-ui",
+  "version": "0.3.2",
+  "description": "Reusable React drawing controls for the DrawMotive canvas editor.",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./controller": { "types": "./dist/ui-controller.d.ts", "default": "./dist/ui-controller.js" },
+    "./styles.css": "./dist/index.css"
+  },
+  "files": ["dist/index.js", "dist/index.css", "dist/ui-controller.js", "dist/*.d.ts", "dist/MaterialSymbols-LICENSE.txt", "dist/MaterialSymbols-NOTICE.txt"],
+  "sideEffects": ["**/*.css"],
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/drawmotive/editor-ui.git" },
+  "homepage": "https://github.com/drawmotive/editor-ui#readme",
+  "bugs": { "url": "https://github.com/drawmotive/editor-ui/issues" },
+  "engines": { "node": ">=22" },
+  "publishConfig": { "access": "public", "registry": "https://registry.npmjs.org/", "tag": "latest" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test --test-concurrency=1 test/*.test.mjs",
+    "test:package": "node --test --test-concurrency=1 test/*.package.mjs",
+    "test:browser": "playwright test",
+    "preview": "node test/serve.mjs",
+    "release:check": "node .release/check.cjs --ready",
+    "prepack": "npm run release:check && npm run build"
+  },
+  "dependencies": { "@drawmotive/editor": "0.3.2", "@mantine/core": "9.7.4", "@mantine/hooks": "9.7.4", "@phosphor-icons/react": "2.1.10" },
+  "peerDependencies": { "react": "19.3.1", "react-dom": "19.3.1" },
+  "devDependencies": { "@playwright/test": "1.63.0", "@types/react": "19.3.0", "@types/react-dom": "19.3.0", "esbuild": "0.28.2", "typescript": "^7.0.2" }
+}

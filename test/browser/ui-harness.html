@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="icon" href="data:,"><link rel="stylesheet" href="/dist/standalone.css">
+<style>body{margin:0} .editor{position:relative;width:640px;height:420px;display:inline-block;border:1px solid #ddd} .editor canvas{width:100%;height:100%;border:0}</style></head>
+<body><script type="module">
+import { mountEditorUi } from '/dist/standalone.js';
+import { createEditorUiController } from '/dist/standalone.js';
+const caps={stroke:true,fill:true,cornerRadius:true,editText:true,text:false,line:false,group:false,groupTitle:false,verticalTextAlignment:false,connectorRouting:false};
+const model={data:{paintStyle:{color:{colorClass:'PrimaryStroke',colorValue:null},fillColor:{colorClass:'PrimaryFill',colorValue:null},strokeWidth:{widthClass:'Normal',widthValue:null},strokeClass:'Solid'},cornerRadius:0},fontStyle:{size:{sizeClass:'Medium',sizeValue:null},color:{colorClass:'PrimaryStroke',colorValue:null},weight:400,slant:'Upright',textAlign:'Center',verticalTextAlign:'Center'},startStyle:0,endStyle:1,routing:'Straight'};
+const resolved={cornerRadius:0,fontStyle:{size:{sizeValue:16},weight:400,slant:'Upright',textAlign:'Center',verticalTextAlign:'Center'},groupColorRole:null,groupHeaderVisible:true};
+globalThis.mount = (options={},fontFamily)=>{
+ const root=document.createElement('div');root.className='editor';const canvas=document.createElement('canvas');const host=document.createElement('div');host.className='drawmotive-canvas-host';host.append(canvas);root.append(host);document.body.append(root);
+ if(fontFamily)host.style.setProperty('--drawmotive-font-family',fontFamily);
+ const state={revision:'r0',health:'healthy',editingEnabled:true,busy:false,canUndo:false,canRedo:false,tool:'select',zoom:1,sketchyMode:false};
+ const listeners={state:new Set(),disposing:new Set(),selection:new Set(),preferences:new Set(),dispose:new Set()};const calls=[];
+ const preferences={darkTheme:false,showGrid:true,snapToGrid:true};
+ const metadata={title:'',style:0,theme:'default'};
+ const getScene=()=>({revision:state.revision,metadata:{type:'DSceneMetadata',model:{...metadata},schema:{type:'DSceneMetadata',properties:[],operations:[]}},items:[]});
+ let selection={revision:'r0',token:{session:crypto.randomUUID(),version:1},items:[],anchor:{left:100,top:140,right:220,bottom:220}}, failure;
+ const editor={lifecycle:'ready',textEditing:'inline',
+  onStateChanged(fn){listeners.state.add(fn);fn({...state});return()=>listeners.state.delete(fn)},
+  onEvent(name,fn){const owner=name==='disposing'?listeners.disposing:listeners.selection;owner.add(fn);return()=>owner.delete(fn)},
+  onDisposed(fn){listeners.dispose.add(fn);return()=>listeners.dispose.delete(fn)},
+  onPreferencesChanged(fn){listeners.preferences.add(fn);fn({...preferences});return()=>listeners.preferences.delete(fn)},
+  async getSelection(){return selection},async getPreferences(){return {...preferences}},async getScene(){return getScene()},
+  async dispose(){editor.lifecycle='disposing';listeners.disposing.forEach(fn=>fn());editor.lifecycle='disposed';listeners.dispose.forEach(fn=>fn());root.remove()},
+ };
+ for(const method of ['undo','redo','setTool','editScene','deleteSelection','beginTextEditing','copySelection','copyToClipboard','pasteSelection','pasteFromClipboard','cancelInteraction','beginPan','endPan','repeatLastTool','updateInteractionModifiers','setSketchyMode','zoom','invokeAction','setPreferences']) editor[method]=async(...args)=>{calls.push({method,args});if(failure)throw Object.assign(new Error(failure.message),{code:failure.code});if(method==='beginPan')return true;if(method==='copySelection')return {version:1,data:'AQID'};if(method==='copyToClipboard')return {internal:true,system:'skipped'};if(method==='setPreferences'){Object.assign(preferences,args[0]);listeners.preferences.forEach(fn=>fn({...preferences}));}};
+ const controller=createEditorUiController(editor,options);
+ const editScene=editor.editScene;editor.editScene=async edit=>{await editScene(edit);const changes=edit.changes.filter(change=>change.itemId==null);if(changes.length){for(const change of changes)metadata[change.path[0]]=change.value;state.revision='r'+(Number(state.revision.slice(1))+1);state.sketchyMode=metadata.style===1;listeners.state.forEach(fn=>fn({...state}));}};
+ const mounted=mountEditorUi({editor,controller,container:root});
+ const view={dispose(){mounted.dispose();controller.dispose();}};
+ const api={editor,controller,root,calls,view,listeners,
+  select(kind='Shape',overrides={}){const typeCaps=kind==='Line'?{line:true,fill:false,cornerRadius:false}:kind.includes('Text')?{text:true,stroke:false,fill:false,cornerRadius:false}:kind==='Group'?{group:true,groupTitle:true}:{};const item={id:kind,kind,bindingItemId:null,textId:null,capabilities:{...caps,...typeCaps},model:structuredClone(model),resolved:structuredClone(resolved),screenBounds:selection.anchor,...overrides};if(kind==='Group')item.boundText={id:'title',kind:'BoundText',capabilities:{...caps,text:true,stroke:false,fill:false,verticalTextAlignment:true},model:structuredClone(model),resolved:structuredClone(resolved)};selection={...selection,token:{...selection.token,version:selection.token.version+1},items:[item]};listeners.selection.forEach(fn=>fn(selection));},
+  setState(value){Object.assign(state,value);listeners.state.forEach(fn=>fn({...state}));},
+  refreshSelection(){selection={...selection,anchor:{...selection.anchor,left:selection.anchor.left+20}};listeners.selection.forEach(fn=>fn(selection));},
+  setFailure(value){failure=value},
+  updateDrawing(theme,style=0){Object.assign(metadata,{theme,style});state.revision='r'+(Number(state.revision.slice(1))+1);state.sketchyMode=style===1;listeners.state.forEach(fn=>fn({...state}));},
+  updateAction(id,value){void controller.setActionState(id,value);}
+ };return api;
+};globalThis.instances=[];
+</script></body></html>

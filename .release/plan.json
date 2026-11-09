@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "releaseVersion": "0.3.2",
+  "channel": "stable",
+  "name": "@drawmotive/editor-ui",
+  "version": "0.3.2",
+  "dependencies": {
+    "@drawmotive/editor": "0.3.2"
+  },
+  "native": false,
+  "publishable": true
+}
