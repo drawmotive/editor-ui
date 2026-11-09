@@ -4,24 +4,6 @@ import { fileURLToPath } from 'node:url';
 test.use({ launchOptions: { executablePath: process.env.DRAWMOTIVE_CHROMIUM_PATH } });
 test.beforeEach(async({page})=>{await page.goto('/test/browser/ui-harness.html');await page.waitForFunction(()=>typeof mount==='function',undefined,{timeout:5000});});
 
-for(const width of [390,900]) for(const darkTheme of [false,true]) test(`bottom controls leave the native branding row clear at ${width}px in ${darkTheme?'dark':'light'} mode`,async({page})=>{
- await page.evaluate(({width,darkTheme})=>{
-  instances.push(mount({buttons:{help:true},regions:{bottomLeft:{items:['help']}}}));
-  const instance=instances[0];instance.root.style.width=width+'px';instance.root.style.height='300px';
-  // The fixture omits native CSS; mirror its full-height host for canvas hit testing.
-  instance.root.querySelector('.drawmotive-canvas-host').style.height='100%';
-  instance.setState({editingEnabled:false});instance.editor.setPreferences({darkTheme});
- },{width,darkTheme});
- const host=page.locator('.editor'),bounds=await host.boundingBox();
- for(const region of ['bottomLeft','bottomRight']) {
-  const toolbar=page.locator(`[data-region="${region}"]`);await expect(toolbar).toBeVisible();
-  const controls=await toolbar.boundingBox();expect(controls.y+controls.height).toBeLessThanOrEqual(bounds.y+bounds.height-30);
- }
- expect(await host.evaluate(element=>{
-  const bounds=element.getBoundingClientRect();return document.elementFromPoint(bounds.right-16,bounds.bottom-16)?.tagName;
- })).toBe('CANVAS');
-});
-
 test('all four corners and drawing tools are configurable without hiding inline editing',async({page})=>{
  await page.evaluate(()=>instances.push(mount({regions:{topLeft:{items:['undo']},topRight:{items:['host.save']},bottomLeft:{items:['sketchyMode']},bottomRight:{items:['zoomIn']}},actions:[{id:'host.save',label:'Save',onInvoke(){globalThis.saved=true}}],drawingToolbar:{position:'bottom',tools:['diamond']}})));
  for(const id of ['topLeft','topRight','bottomLeft','bottomRight']) await expect(page.locator('[data-region="'+id+'"]')).toBeVisible();

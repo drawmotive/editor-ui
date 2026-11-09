@@ -87,8 +87,9 @@ DOM and typography notifications, so keep the supported SDK version installed.
 configuration as `ui`, plus ordinary public editor creation options.
 With the matching SDK/native runtime, this includes the optional `licenseKey`
 deployment prop. Changing it disposes the previous native session before creating
-its successor. The bottom controls leave the native branding row clear; no
-branding text or license validation is implemented by this React package.
+its successor. Bottom controls retain their original corner positions; native
+branding sits above them at the canvas bottom center. No branding text or license
+validation is implemented by this React package.
 See [Editor licensing](https://textgraph.dev/editor/licensing) for the optional
 official removal service and the SDK's immutable `getLicenseStatus()` snapshot.
 
