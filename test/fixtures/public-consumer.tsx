@@ -6,6 +6,7 @@ import {
   type EditorRegionId, type EditorButtonId, type EditorUiController,
 } from '@drawmotive/editor-ui';
 import { createEditorUiController as controllerEntry, type EditorUiController as ControllerEntry } from '@drawmotive/editor-ui/controller';
+import '@drawmotive/editor-ui/styles.css';
 
 declare const editor: EditorInstance;
 declare const container: HTMLElement;

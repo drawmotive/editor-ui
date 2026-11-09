@@ -29,7 +29,7 @@ test('a packed public package supports a standalone typed browser host', { timeo
   const packed = JSON.parse((await npm(['pack', '--ignore-scripts', '--json', '--pack-destination', directory], root)).stdout);
   const { filename, files } = (Array.isArray(packed) ? packed : Object.values(packed))[0];
   const names = files.map(file => file.path);
-  for (const required of ['dist/index.js', 'dist/index.css', 'dist/index.d.ts', 'dist/ui-controller.js', 'dist/ui-controller.d.ts', 'dist/MaterialSymbols-LICENSE.txt', 'dist/MaterialSymbols-NOTICE.txt', 'LICENSE']) {
+  for (const required of ['dist/index.js', 'dist/index.css', 'dist/index.css.d.ts', 'dist/index.d.ts', 'dist/ui-controller.js', 'dist/ui-controller.d.ts', 'dist/MaterialSymbols-LICENSE.txt', 'dist/MaterialSymbols-NOTICE.txt', 'LICENSE']) {
     assert.ok(names.includes(required), 'Missing public artifact: ' + required);
   }
   assert.ok(names.every(name => ['LICENSE', 'README.md', 'package.json'].includes(name)
@@ -52,11 +52,14 @@ test('a packed public package supports a standalone typed browser host', { timeo
     assert.deepEqual(await readFile(path.join(installed, 'dist', notice)), await readFile(path.join(root, 'src', notice)));
   }
   await writeFile(path.join(consumer, 'consumer.tsx'), await readFile(path.join(root, 'test/fixtures/public-consumer.tsx')));
-  // Browser bundlers provide the same ambient stylesheet module contract.
-  await writeFile(path.join(consumer, 'environment.d.ts'), "declare module '*.css';\n");
+  // Mantine imports these three stylesheets from its own declarations. Keep
+  // those ambient names narrow so our package cannot hide missing CSS imports.
+  await writeFile(path.join(consumer, 'environment.d.ts'), [
+    "declare module '*/baseline.css';", "declare module '*/default-css-variables.css';", "declare module '*/global.css';",
+  ].join('\n'));
   await writeFile(path.join(consumer, 'tsconfig.json'), JSON.stringify({ compilerOptions: {
     target: 'ES2022', module: 'Preserve', moduleResolution: 'Bundler', jsx: 'react-jsx',
-    strict: true, noEmit: true, skipLibCheck: false, lib: ['ESNext', 'DOM'],
+    strict: true, noEmit: true, skipLibCheck: false, noUncheckedSideEffectImports: true, lib: ['ESNext', 'DOM'],
   }, include: ['consumer.tsx', 'environment.d.ts'] }));
   await execute(process.execPath, [path.join(consumer, 'node_modules/typescript/bin/tsc'), '-p', consumer], { cwd: consumer });
   const { build } = await import(pathToFileURL(path.join(consumer, 'node_modules/esbuild/lib/main.js')));

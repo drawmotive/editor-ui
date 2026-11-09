@@ -7,7 +7,7 @@
   "exports": {
     ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
     "./controller": { "types": "./dist/ui-controller.d.ts", "default": "./dist/ui-controller.js" },
-    "./styles.css": "./dist/index.css"
+    "./styles.css": { "types": "./dist/index.css.d.ts", "default": "./dist/index.css" }
   },
   "files": ["dist/index.js", "dist/index.css", "dist/ui-controller.js", "dist/*.d.ts", "dist/MaterialSymbols-LICENSE.txt", "dist/MaterialSymbols-NOTICE.txt"],
   "sideEffects": ["**/*.css"],
