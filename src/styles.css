@@ -40,6 +40,7 @@
 .dm-editor-ui .dm-panel {pointer-events:auto;z-index:30;padding:5px;border:1px solid var(--dm-border);border-radius:5px;background:var(--dm-surface);color:var(--dm-text);box-shadow:0 3px 12px #0003;max-width:calc(100cqw - 8px);}
 .dm-panel-heading{padding:2px 4px;margin:-1px -1px 2px;background:var(--dm-header);font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
 .dm-panel-stack.dm-drawing-properties{min-width:0;max-width:100%;padding:0;gap:8px}.dm-property-description{margin:0;color:var(--dm-text);font-size:12px;line-height:1.45;opacity:.8}
+.dm-drawing-property{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);column-gap:12px;align-items:center}.dm-drawing-property-label{margin:0}.dm-drawing-property-input{min-width:0}
 .dm-settings{width:310px;max-width:100%;max-height:calc(100cqh - 64px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
 .dm-settings-header{padding:10px 12px}.dm-settings-header h2{margin:0;font-size:16px;font-weight:600;line-height:1.4}
 .dm-settings-section{display:flex;flex-direction:column;gap:14px;padding:14px 12px;border-top:1px solid var(--dm-border)}
