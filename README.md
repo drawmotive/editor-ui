@@ -77,8 +77,11 @@ async function closeDrawing() {
 
 The container must have a usable size. Imperative mounting supplies relative
 positioning when needed and restores it on disposal. Native canvas input, grips
-and inline text remain owned by the SDK. The controls use the SDK canvas host's
-DOM and typography notifications, so keep the supported SDK version installed.
+and inline text remain owned by the SDK. The controls use Mantine's default
+typography and colors, independently of drawing themes, styles and surrounding
+Mantine provider overrides. Drawing palette swatches preview document colors;
+inline text editing retains the document's typography. Keep the supported SDK
+version installed for canvas host DOM integration.
 
 ## Host options and ownership
 

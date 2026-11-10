@@ -30,6 +30,7 @@ for (const [name, entry, external] of [
   ['ui-controller', 'src/ui-controller.js', ['@drawmotive/editor']],
   ['standalone', 'src/standalone.ts', []],
   ['quick-insert-preview', 'test/browser/quick-insert-preview.tsx', []],
+  ['typography-harness', 'test/browser/typography-harness.tsx', []],
 ]) await build({ absWorkingDir: root, entryPoints: [entry], outfile: path.join(root, 'dist', name + '.js'),
   bundle: true, format: 'esm', platform: 'browser', target: 'es2022', jsx: 'automatic', minify: true, external, legalComments: 'eof' });
 // Every distribution embedding Material SVG paths carries the upstream notices.
