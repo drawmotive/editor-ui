@@ -1,7 +1,7 @@
 import {useEffect,useRef,useState} from 'react';
 import {NativeSelect} from '@mantine/core';
 import type {EditorSceneSnapshot} from '@drawmotive/editor';
-import {PanelHeading,ToolButton,useUi} from './controls.js';
+import {ToolButton,useUi} from './controls.js';
 
 /** Document appearance is read and edited at the native revision boundary, never preference storage. */
 export function DrawingPropertiesPanel() {
@@ -31,8 +31,6 @@ export function DrawingPropertiesPanel() {
     await run(()=>editor.editScene({revision:snapshot.revision,description:'Change drawing '+property,changes:[{path:[property],value}]}));
   };
   return <div className="dm-panel-stack dm-drawing-properties" aria-busy={!current&&!error}>
-    <PanelHeading>Drawing properties</PanelHeading>
-    <p className="dm-property-description">Saved with this drawing.</p>
     <NativeSelect label="Theme" value={theme} disabled={disabled} data-testid="drawing-theme"
       data={[{value:'default',label:'Default'},{value:'minimal',label:'Minimal'}]}
       onChange={event=>void change('theme',event.currentTarget.value)}/>

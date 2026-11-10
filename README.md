@@ -110,10 +110,12 @@ write.
 
 Press `/` on an idle editable canvas for Quick insert. Text fields retain literal
 slash input. Recent and frequently used tools use browser-local history, with an
-in-memory fallback when storage is unavailable. Drawing properties edit document
-metadata through native transactions; Settings controls local appearance and grid
-preferences. Hiding controls does not change native editing permissions or the
-SDK's `textEditing` policy.
+in-memory fallback when storage is unavailable. Settings groups local View
+preferences and saved Drawing properties in one panel. Drawing properties edit
+document metadata through native transactions; View controls local appearance
+and grid preferences. The legacy `drawingProperties` toolbar ID opens this same
+Settings panel; default controls use only `settings`. Hiding controls does not
+change native editing permissions or the SDK's `textEditing` policy.
 
 ## Development and verification
 

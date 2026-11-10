@@ -24,7 +24,7 @@ test('the full UI defaults preserve each region, toolbar without native text pol
   assert.ok(Object.isFrozen(ui));
   assert.ok(Object.isFrozen(ui.regions.topLeft.items));
   assert.deepEqual(ui.drawingToolbar.tools,['arrow','rectangle','ellipse','diamond','capsule','star','cloud','text']);
-  assert.deepEqual(ui.regions.bottomRight.items,['drawingProperties','zoomOut','resetZoom','zoomIn','settings']);
+  assert.deepEqual(ui.regions.bottomRight.items,['zoomOut','resetZoom','zoomIn','settings']);
 });
 
 test('each corner and toolbar has independent visibility and native text policy stays separate', () => {

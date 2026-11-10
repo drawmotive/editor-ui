@@ -1,5 +1,4 @@
-import { Checkbox, NativeSelect } from '@mantine/core';
-import type { EditorPreferences } from '@drawmotive/editor';
+import { NativeSelect } from '@mantine/core';
 import type { UiSelectedObject } from './selection-model.js';
 import { callModel, setModel } from './selection-model.js';
 import { Icon, EndpointIcon, PaletteIcon, StrokeIcon } from './icons.js';
@@ -90,12 +89,6 @@ export function TextButtons({target}: {target:UiSelectedObject}) {
     onClick={()=>void edit('Set text size',item=>[setModel(item,['fontStyle','size','sizeClass'],fontSize),setModel(item,['fontStyle','size','sizeValue'],null)],target)} />)}</span>
     <ToolButton icon="bold" selected={uniform(p.bold)===true} onClick={()=>void edit('Toggle bold',item=>[setModel(item,['fontStyle','weight'],uniform(p.bold)===true?400:700)],target)}/>
     <ToolButton icon="italic" selected={uniform(p.italic)===true} onClick={()=>void edit('Toggle italic',item=>[setModel(item,['fontStyle','slant'],uniform(p.italic)===true?'Upright':'Italic')],target)}/>
-  </div>;
-}
-
-export function SettingsPanel({preferences,onChange}: {preferences:EditorPreferences;onChange:(value:EditorPreferences)=>Promise<unknown>}) {
-  return <div className="dm-panel-stack"><Checkbox label="Dark Theme" data-testid="settings-dark-theme" checked={preferences.darkTheme??false} onChange={event=>void onChange({darkTheme:event.currentTarget.checked})}/>
-    <Checkbox label="Show and Snap to Grid" data-testid="settings-show-grid" checked={preferences.showGrid??true} onChange={event=>void onChange({showGrid:event.currentTarget.checked,snapToGrid:event.currentTarget.checked})}/>
   </div>;
 }
 

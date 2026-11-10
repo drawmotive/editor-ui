@@ -11,9 +11,9 @@ import { CreationTooltip } from './creation-tooltip.js';
 import { tooltipTheme } from './tooltip-theme.js';
 import { phosphorTheme } from './mantine-icons.js';
 import { EndpointIcon, Icon, PaletteIcon } from './icons.js';
-import { AlignPanel, Colors, EndpointPanel, GroupPanel, MorePanel, RoutingPanel, SettingsPanel, StrokePanel, TitlePanel } from './panels.js';
+import { AlignPanel, Colors, EndpointPanel, GroupPanel, MorePanel, RoutingPanel, StrokePanel, TitlePanel } from './panels.js';
 import { useEditorHotkeys } from './use-editor-hotkeys.js';
-import { DrawingPropertiesPanel } from './drawing-properties.js';
+import { SettingsPanel } from './settings.js';
 import { QuickInsert } from './quick-insert.js';
 import { createQuickInsertHistory, QUICK_INSERT_OBJECTS } from './quick-insert-model.js';
 import { useNativeTypography } from './use-native-typography.js';
@@ -149,8 +149,8 @@ function EditorUiSession({editor,controller,container,slots={},colorScheme,class
     if(!ui.buttons[id as keyof typeof ui.buttons])return null;
     const disabled=(id==='undo'?!state.canUndo||editingBlocked:id==='redo'?!state.canRedo||editingBlocked:
       DRAWING_TOOL_IDS.some(tool=>tool===id)?editingBlocked:false);
-    if(id==='settings')return <PanelButton key={id} id="settings" button={<ToolButton icon={id}/>}> <SettingsPanel preferences={preferences} onChange={changePreferences}/></PanelButton>;
-    if(id==='drawingProperties')return <PanelButton key={id} id="drawingProperties" button={<ToolButton icon={id}/>}> <DrawingPropertiesPanel/></PanelButton>;
+    // Keep older host configurations working through the same Settings surface.
+    if(id==='settings'||id==='drawingProperties')return <PanelButton key={id} id={id} label="Settings" button={<ToolButton icon="settings"/>}> <SettingsPanel preferences={preferences} onChange={changePreferences}/></PanelButton>;
     if(id==='help')return <PanelButton key={id} id="help" button={<ToolButton icon={id}/>}> <div className="dm-help"><strong>Keyboard shortcuts</strong>{Object.entries(SHORTCUTS).map(([name,key])=><div key={name}>{LABELS[name]}<kbd>{key}</kbd></div>)}</div></PanelButton>;
     const invoke=()=>{
       if(id==='undo'||id==='redo')return editor[id]();

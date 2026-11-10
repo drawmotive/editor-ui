@@ -62,7 +62,7 @@ export function normalizeUiOptions(options = {}) {
     topLeft: ['undo', 'redo'],
     topRight: ['help', ...actions.filter(action => !assignedActions.has(action.id)).map(action => action.id)],
     bottomLeft: [],
-    bottomRight: ['drawingProperties', 'zoomOut', 'resetZoom', 'zoomIn', 'settings'],
+    bottomRight: ['zoomOut', 'resetZoom', 'zoomIn', 'settings'],
   };
   const regions = Object.fromEntries(EDITOR_REGION_IDS.map(id => {
     const region = visibleOptions(regionOptions[id], ['items'], 'ui.regions.' + id);

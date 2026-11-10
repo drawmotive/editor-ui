@@ -295,7 +295,7 @@ test('reusing EditorUi for the next document resets closed state and configurati
 
 test('canvas pointer dismissal keeps native keyboard focus while Escape restores the panel trigger',async({page})=>{
  await page.evaluate(()=>{const current=mount();current.root.classList.add('drawmotive-canvas-host');const canvas=current.root.querySelector('canvas');canvas.tabIndex=0;canvas.addEventListener('pointerdown',()=>canvas.focus());instances.push(current);});
- const settings=page.getByRole('button',{name:'Settings',exact:true});await settings.click();await expect(page.getByRole('dialog',{name:'Settings'})).toBeVisible();await page.locator('canvas').click({position:{x:400,y:300}});
+ const settings=page.getByRole('button',{name:'Settings',exact:true});await settings.click();await expect(page.getByRole('dialog',{name:'Settings'})).toBeVisible();await page.locator('canvas').click({position:{x:200,y:80}});
  await expect(page.getByRole('dialog',{name:'Settings'})).toHaveCount(0);
  // Mantine schedules focus return after dismissal; observe that completed handoff.
  await page.waitForTimeout(100);await expect(page.locator('canvas')).toBeFocused();
