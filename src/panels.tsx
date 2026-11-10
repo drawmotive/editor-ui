@@ -1,6 +1,6 @@
 import { NativeSelect } from '@mantine/core';
 import type { UiSelectedObject } from './selection-model.js';
-import { callModel, setModel } from './selection-model.js';
+import { callModel, setModel, themeValue } from './selection-model.js';
 import { Icon, EndpointIcon, PaletteIcon, StrokeIcon } from './icons.js';
 import { colorCss, PanelButton, PanelHeading, Separator, ToolButton, uniform, useUi } from './controls.js';
 import { selectionSubjects } from './ui-model.js';
@@ -17,7 +17,7 @@ export function Colors({fill=false,target}: {fill?:boolean;target?:UiSelectedObj
     return <div key={String(isFill)}><PanelHeading>{isFill?'Fill Color':fill?'Border Color':'Color'}</PanelHeading>
       <div className="dm-panel-row">{roles.map(role=><ToolButton key={role} aria-label={role==='Transparent'?(isFill?'No Fill':'No Border'):role.replace(/(Stroke|Fill)$/,'')+' color'}
         selected={selected?.role===role&&selected.argb===null} data-testid={'panel-'+(isFill?'fill':'stroke')+'-color-'+role.toLowerCase()}
-        onClick={()=>void edit(isFill?'Change fill color':'Change stroke color',item=>{const path=item.capabilities.text?['fontStyle','color']:['data','paintStyle',isFill?'fillColor':'color'];return [setModel(item,[...path,'colorClass'],role),setModel(item,[...path,'colorValue'],null)];},target)}>
+        onClick={()=>void edit(isFill?'Change fill color':'Change stroke color',item=>{const path=item.capabilities.text?['fontStyle','color']:['data','paintStyle',isFill?'fillColor':'color'];return [setModel(item,path,themeValue(item,'colors',role))];},target)}>
         {role==='Transparent'?<Icon name="transparent" style={{color:'var(--dm-color-secondary-stroke)'}}/>:<PaletteIcon fill={isFill?colorCss(role):'none'} style={{color:colorCss(role)}} />}
       </ToolButton>)}</div></div>;
   })}</>;
@@ -26,7 +26,7 @@ export function Colors({fill=false,target}: {fill?:boolean;target?:UiSelectedObj
 export function StrokePanel() {
   const {selection,edit}=useUi(),p=selection!.properties;
   return <><PanelHeading>Line Width</PanelHeading><div className="dm-panel-row">{['Thin','Normal','Bold'].map((width,index)=><ToolButton key={width}
-    aria-label={width+' line'} selected={uniform(p.strokeWidth)===width} data-testid={'panel-stroke-width-'+index} onClick={()=>void edit('Change stroke width',item=>[setModel(item,['data','paintStyle','strokeWidth','widthClass'],width),setModel(item,['data','paintStyle','strokeWidth','widthValue'],null)])}>
+    aria-label={width+' line'} selected={uniform(p.strokeWidth)===width} data-testid={'panel-stroke-width-'+index} onClick={()=>void edit('Change stroke width',item=>[setModel(item,['data','paintStyle','strokeWidth'],themeValue(item,'lineWidths',width))])}>
     <StrokeIcon width={index}/>
   </ToolButton>)}</div><PanelHeading>Line Style</PanelHeading><div className="dm-panel-row">{['Solid','Dashed','Dotted'].map((stroke,index)=><ToolButton key={stroke}
     aria-label={stroke+' line'} selected={uniform(p.strokeStyle)===stroke} data-testid={'panel-stroke-style-'+index} onClick={()=>void edit('Change stroke style',item=>[setModel(item,['data','paintStyle','strokeClass'],stroke)])}>
@@ -86,7 +86,7 @@ export function TitlePanel() {
 export function TextButtons({target}: {target:UiSelectedObject}) {
   const {edit}=useUi(),p=target.properties;
   return <div className="dm-panel-row"><span className="dm-button-group">{['Small','Medium','Large'].map(fontSize=><ToolButton key={fontSize} icon={'textSize'+fontSize} selected={uniform(p.textSize)===fontSize}
-    onClick={()=>void edit('Set text size',item=>[setModel(item,['fontStyle','size','sizeClass'],fontSize),setModel(item,['fontStyle','size','sizeValue'],null)],target)} />)}</span>
+    onClick={()=>void edit('Set text size',item=>[setModel(item,['fontStyle','size'],themeValue(item,'fontSizes',fontSize))],target)} />)}</span>
     <ToolButton icon="bold" selected={uniform(p.bold)===true} onClick={()=>void edit('Toggle bold',item=>[setModel(item,['fontStyle','weight'],uniform(p.bold)===true?400:700)],target)}/>
     <ToolButton icon="italic" selected={uniform(p.italic)===true} onClick={()=>void edit('Toggle italic',item=>[setModel(item,['fontStyle','slant'],uniform(p.italic)===true?'Upright':'Italic')],target)}/>
   </div>;

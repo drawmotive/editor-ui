@@ -71,8 +71,9 @@ export function colorVariable(role='Foreground') {
   return '--dm-color-' + role.replace(/([a-z])([A-Z])/g,'$1-$2').toLowerCase().replace(/[^a-z-]/g,'');
 }
 
-export function colorCss(role?: string, argb?:number|null) {
-  if(argb != null) { const color=argb>>>0;return '#' + (color&0xffffff).toString(16).padStart(6,'0') + (color>>>24).toString(16).padStart(2,'0'); }
+export function colorCss(role?: string|null, argb?:string|null) {
+  // Decimal Int64 transport preserves unsigned ARGB; CSS places alpha last.
+  if(argb != null) { const color=Number(argb).toString(16).padStart(8,'0');return '#' + color.slice(2) + color.slice(0,2); }
   if(role==='Transparent') return 'transparent';
-  return 'var(' + colorVariable(role) + ', currentColor)';
+  return 'var(' + colorVariable(role??undefined) + ', currentColor)';
 }

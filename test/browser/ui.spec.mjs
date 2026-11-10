@@ -1,6 +1,36 @@
 import { test, expect } from '@playwright/test';
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
+
+test('stroke and text role actions write one primitive leaf from native role maps',async({page})=>{
+ await page.evaluate(async()=>{
+  instances.push(mount());instances[0].select();
+  const {resolved}=(await instances[0].editor.getSelection()).items[0];
+  instances[0].select('Shape',{resolved:{...resolved,themeValues:{...resolved.themeValues,lineWidths:{...resolved.themeValues.lineWidths,Bold:-73}}}});
+ });
+ await page.getByTestId('context-toolbar-stroke-style').click();
+ await expect(page.getByTestId('panel-stroke-width-1')).toHaveAttribute('aria-pressed','true');
+ await page.getByTestId('panel-stroke-width-2').click();
+ expect(await page.evaluate(()=>instances[0].calls.at(-1).args[0].changes)).toEqual([{itemId:'Shape',path:['data','paintStyle','strokeWidth'],value:-73}]);
+ await page.evaluate(()=>instances[0].select('IndependentText'));
+ await expect(page.getByTestId('context-toolbar-text-size-medium')).toHaveAttribute('aria-pressed','true');
+ await page.getByTestId('context-toolbar-text-size-large').click();
+ expect(await page.evaluate(()=>instances[0].calls.at(-1).args[0].changes)).toEqual([{itemId:'IndependentText',path:['fontStyle','size'],value:-3}]);
+ await page.evaluate(()=>instances[0].select('Group'));
+ await page.getByTestId('context-toolbar-group-title-style').click();
+ await page.getByRole('dialog',{name:'Title style',exact:true}).getByRole('button',{name:'Small text',exact:true}).click();
+ expect(await page.evaluate(()=>instances[0].calls.at(-1).args[0].changes)).toEqual([{itemId:'title',path:['fontStyle','size'],value:-1}]);
+});
+
+test('literal colors preserve unsigned ARGB and alpha in toolbar swatches',async({page})=>{
+ await page.evaluate(()=>{instances.push(mount());instances[0].select('Shape',{model:{data:{paintStyle:{color:'4294967295',fillColor:'2148606515',strokeWidth:1250,strokeClass:'Solid'},cornerRadius:0}}});});
+ const icons=page.locator('.dm-stroke-fill > svg');
+ await expect(icons.first()).toHaveCSS('--dm-palette-fill','#11223380');
+ await expect(icons.last()).toHaveCSS('color','rgb(255, 255, 255)');
+ await page.getByTestId('context-toolbar-fill-color').click();
+ await expect(page.getByTestId('panel-fill-color-transparent')).not.toHaveAttribute('aria-pressed','true');
+});
+
 test.use({ launchOptions: { executablePath: process.env.DRAWMOTIVE_CHROMIUM_PATH } });
 test.beforeEach(async({page})=>{await page.goto('/test/browser/ui-harness.html');await page.waitForFunction(()=>typeof mount==='function',undefined,{timeout:5000});});
 
@@ -23,7 +53,7 @@ test('context panels send one versioned generated-model batch and preserve the t
  const colors=page.getByRole('dialog',{name:'Border and Fill Color',exact:true});
  expect(await colors.evaluate(panel=>{const bounds=panel.getBoundingClientRect();return [...panel.querySelectorAll('button')].every(button=>{const rect=button.getBoundingClientRect();return rect.left>=bounds.left&&rect.right<=bounds.right&&rect.top>=bounds.top&&rect.bottom<=bounds.bottom;});})).toBe(true);
  await page.getByTestId('panel-fill-color-secondaryfill').click();
- const call=await page.evaluate(()=>instances[0].calls.at(-1));expect(call.method).toBe('editScene');expect(call.args[0]).toMatchObject({revision:'r0',token:{version:2},changes:[{itemId:'Shape',path:['data','paintStyle','fillColor','colorClass'],value:'SecondaryFill'},{itemId:'Shape',path:['data','paintStyle','fillColor','colorValue'],value:null}]});
+ const call=await page.evaluate(()=>instances[0].calls.at(-1));expect(call.method).toBe('editScene');expect(call.args[0]).toMatchObject({revision:'r0',token:{version:2},changes:[{itemId:'Shape',path:['data','paintStyle','fillColor'],value:'-7'}]});
  await page.evaluate(()=>instances[0].setFailure({code:'StaleSelection',message:'Selection changed. Select again.'}));
  await page.getByTestId('panel-stroke-color-foreground').click();await expect(page.getByRole('alert')).toContainText('Selection changed');
  expect(await page.locator('body > .mantine-Popover-dropdown').count()).toBe(0);
@@ -238,7 +268,7 @@ test('group controls stay inline and the title toolbar keeps its nested color pa
  await page.getByRole('button',{name:'Title style',exact:true}).click();
  const title=page.getByRole('dialog',{name:'Title style',exact:true});await expect(title.getByLabel('Restore title theme style',{exact:true})).toBeVisible();
  await title.getByRole('button',{name:'Color',exact:true}).click();await page.getByTestId('panel-stroke-color-warningstroke').click();
- expect(await page.evaluate(()=>instances[0].calls.at(-1).args[0].changes)).toEqual([{itemId:'title',path:['fontStyle','color','colorClass'],value:'WarningStroke'},{itemId:'title',path:['fontStyle','color','colorValue'],value:null}]);
+ expect(await page.evaluate(()=>instances[0].calls.at(-1).args[0].changes)).toEqual([{itemId:'title',path:['fontStyle','color'],value:'-12'}]);
  await expect(title).toBeVisible();
 });
 test('a toolbar mounted after a busy document boundary is positioned at the retained selection',async({page})=>{

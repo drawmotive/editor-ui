@@ -38,10 +38,10 @@ for (const trigger of ['shortcut', 'menu']) test(`${trigger} starts system copy 
   expect(await page.evaluate(() => access)).toEqual([{ method: 'write', active: true }]);
   expect(await page.evaluate(() => captures.length)).toBe(1);
   expect(await page.evaluate(() => typeof copiedText)).toBe('undefined');
-  await page.evaluate(async () => { const { png } = await import('/test/fixtures/clipboard-image.mjs'); finishCopy({ version: 1, data: 'AQID', png }); });
-  await page.waitForFunction(() => typeof copiedText === 'string');
+  await page.evaluate(async () => { const { png } = await import('/test/fixtures/clipboard-image.mjs'); finishCopy({ version: 2, data: 'AQID', png }); });
+  await expect.poll(() => page.evaluate(() => globalThis.copiedText)).toBe('drawmotive/selection:2\nAQID');
   await page.locator('canvas').press('Control+v');
-  await expect.poll(() => page.evaluate(() => pasted)).toEqual([{ payload: { version: 1, data: 'AQID' }, point: { x: 12, y: 34 } }]);
+  await expect.poll(() => page.evaluate(() => pasted)).toEqual([{ payload: { version: 2, data: 'AQID' }, point: { x: 12, y: 34 } }]);
   expect(await page.evaluate(() => access.at(-1))).toEqual({ method: 'read', active: true });
 });
 
