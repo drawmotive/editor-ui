@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { MantineProvider, MantineThemeProvider, mergeThemeOverrides } from '@mantine/core';
 import type { EditorInstance, EditorPreferences, EditorSelectionSnapshot, EditorState } from '@drawmotive/editor';
-import { callModel, projectSelection, selectionEdit, setModel } from './selection-model.js';
+import { callModel, projectSelection, selectionEdit, setModel, themeValue } from './selection-model.js';
 import type { SelectionEdit, UiSelection } from './selection-model.js';
 import { createEditorUiController, type EditorUiController } from './ui-controller.js';
 import { DRAWING_TOOL_IDS, type DrawingToolId, type EditorRegionItem, type EditorUiOptions } from './ui-options.js';
@@ -180,7 +180,7 @@ function EditorUiSession({editor,controller,container,slots={},colorScheme,class
     const selected=id==='bold'?uniform(p.bold):id==='italic'?uniform(p.italic):id==='cornerRadius'?(uniform(p.cornerRadius)??0)>0:id.startsWith('textSize')?uniform(p.textSize)===id.slice(8):undefined;
     const direct=()=>{
       if(id==='editText')return run(()=>editor.beginTextEditing(item?.id));
-      if(id.startsWith('textSize'))return edit('Set text size',item=>[setModel(item,['fontStyle','size','sizeClass'],id.slice(8)),setModel(item,['fontStyle','size','sizeValue'],null)]);
+      if(id.startsWith('textSize'))return edit('Set text size',item=>[setModel(item,['fontStyle','size'],themeValue(item,'fontSizes',id.slice(8)))]);
       if(id==='bold')return edit('Toggle bold',item=>[setModel(item,['fontStyle','weight'],uniform(p.bold)===true?400:700)]);
       if(id==='italic')return edit('Toggle italic',item=>[setModel(item,['fontStyle','slant'],uniform(p.italic)===true?'Upright':'Italic')]);
       if(id==='cornerRadius')return edit('Toggle corner radius',item=>[callModel(item,'toggleCornerRadius')]);
