@@ -7,8 +7,8 @@ test.beforeEach(async({page})=>{
 });
 
 test('drawing properties edit document metadata and keep editor preferences separate',async({page})=>{
- await page.getByRole('button',{name:'Drawing properties',exact:true}).click();
- const panel=page.getByRole('dialog',{name:'Drawing properties',exact:true});
+ await page.getByRole('button',{name:'Settings',exact:true}).click();
+ const panel=page.getByRole('dialog',{name:'Settings',exact:true});
  await expect(panel.getByLabel('Theme',{exact:true})).toHaveValue('default');
  await panel.getByLabel('Theme',{exact:true}).selectOption('minimal');
  await expect(panel.getByLabel('Theme',{exact:true})).toHaveValue('minimal');
@@ -28,7 +28,7 @@ test('drawing properties edit document metadata and keep editor preferences sepa
 
 test('document properties disable edits while pending and in read-only documents',async({page})=>{
  await page.evaluate(()=>{const instance=instances[0],edit=instance.editor.editScene;instance.editor.editScene=async value=>{await edit(value);await new Promise(resolve=>instance.finishEdit=resolve);};});
- const trigger=page.getByRole('button',{name:'Drawing properties',exact:true});await trigger.click();
+ const trigger=page.getByRole('button',{name:'Settings',exact:true});await trigger.click();
  const theme=page.getByLabel('Theme',{exact:true}),style=page.getByLabel('Drawing style',{exact:true});
  await theme.selectOption('minimal');await expect(style).toBeDisabled();
  await page.evaluate(()=>instances[0].finishEdit());await expect(style).toBeEnabled();
@@ -39,7 +39,7 @@ test('document properties disable edits while pending and in read-only documents
 
 test('an older scene read cannot replace newer drawing properties',async({page})=>{
  await page.evaluate(()=>{const instance=instances[0],read=instance.editor.getScene;let first=true;instance.editor.getScene=async()=>{const snapshot=await read();if(first){first=false;await new Promise(resolve=>instance.finishRead=resolve);}return snapshot;};});
- await page.getByRole('button',{name:'Drawing properties',exact:true}).click();
+ await page.getByRole('button',{name:'Settings',exact:true}).click();
  await page.waitForFunction(()=>typeof instances[0].finishRead==='function');
  await page.evaluate(()=>instances[0].updateDrawing('minimal',1));
  await expect(page.getByLabel('Theme',{exact:true})).toHaveValue('minimal');
@@ -49,7 +49,7 @@ test('an older scene read cannot replace newer drawing properties',async({page})
 });
 
 test('failed property edits report the failure and retain saved metadata',async({page})=>{
- await page.getByRole('button',{name:'Drawing properties',exact:true}).click();
+ await page.getByRole('button',{name:'Settings',exact:true}).click();
  const theme=page.getByLabel('Theme',{exact:true});await expect(theme).toHaveValue('default');
  await page.evaluate(()=>instances[0].setFailure({code:'PersistenceFailed',message:'Unable to save drawing properties.'}));
  await theme.selectOption('minimal');
@@ -60,8 +60,8 @@ test('failed property edits report the failure and retain saved metadata',async(
 test('drawing property fields fit a narrow embedded canvas',async({page})=>{
  await page.setViewportSize({width:240,height:500});
  await page.evaluate(()=>instances[0].root.style.width='100vw');
- await page.getByRole('button',{name:'Drawing properties',exact:true}).click();
- const panel=page.getByRole('dialog',{name:'Drawing properties',exact:true});
+ await page.getByRole('button',{name:'Settings',exact:true}).click();
+ const panel=page.getByRole('dialog',{name:'Settings',exact:true});
  await expect(page.getByLabel('Theme',{exact:true})).toBeEnabled();
  expect(await panel.evaluate(node=>{
   const outer=node.getBoundingClientRect();return [...node.querySelectorAll('select')].every(input=>{const box=input.getBoundingClientRect();return box.left>=outer.left&&box.right<=outer.right;});
@@ -86,8 +86,8 @@ for(const dismissal of ['Escape','trigger','canvas']) test('closed drawing prope
   inline.textContent='Uncommitted draft';inline.style.cssText='position:absolute;left:200px;top:150px;display:none';
   inline.addEventListener('blur',()=>{globalThis.inlineBlurCount++;});host.append(inline);globalThis.inlineBlurCount=0;
  });
- const trigger=page.getByRole('button',{name:'Drawing properties',exact:true});await trigger.click();
- const panel=page.getByRole('dialog',{name:'Drawing properties',exact:true});
+ const trigger=page.getByRole('button',{name:'Settings',exact:true});await trigger.click();
+ const panel=page.getByRole('dialog',{name:'Settings',exact:true});
  await expect.poll(()=>panel.evaluate(node=>node.contains(document.activeElement))).toBe(true);
  if(dismissal==='Escape')await page.keyboard.press('Escape');
  else if(dismissal==='trigger')await trigger.click();

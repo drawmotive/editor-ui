@@ -2,6 +2,7 @@ import type { EditorInstance } from '@drawmotive/editor';
 
 /** Creation tools and the document's sketch mode toggle share toolbar configuration. */
 export type DrawingToolId = 'arrow' | 'rectangle' | 'ellipse' | 'diamond' | 'capsule' | 'star' | 'cloud' | 'text' | 'sketchyMode';
+/** drawingProperties is a legacy Settings entry; defaults expose only settings. */
 export type EditorButtonId = 'undo' | 'redo' | DrawingToolId | 'drawingProperties' | 'zoomIn' | 'zoomOut' | 'resetZoom' | 'settings' | 'help';
 export type EditorRegionId = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 /** Slots name React content resolved by the local UI; elements never cross a port. */

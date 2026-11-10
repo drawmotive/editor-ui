@@ -79,8 +79,11 @@ async function closeDrawing() {
 
 The container must have a usable size. Imperative mounting supplies relative
 positioning when needed and restores it on disposal. Native canvas input, grips
-and inline text remain owned by the SDK. The controls use the SDK canvas host's
-DOM and typography notifications, so keep the supported SDK version installed.
+and inline text remain owned by the SDK. The controls use Mantine's default
+typography and colors, independently of drawing themes, styles and surrounding
+Mantine provider overrides. Drawing palette swatches preview document colors;
+inline text editing retains the document's typography. Keep the supported SDK
+version installed for canvas host DOM integration.
 
 ## Host options and ownership
 
@@ -112,10 +115,12 @@ write.
 
 Press `/` on an idle editable canvas for Quick insert. Text fields retain literal
 slash input. Recent and frequently used tools use browser-local history, with an
-in-memory fallback when storage is unavailable. Drawing properties edit document
-metadata through native transactions; Settings controls local appearance and grid
-preferences. Hiding controls does not change native editing permissions or the
-SDK's `textEditing` policy.
+in-memory fallback when storage is unavailable. Settings groups local View
+preferences and saved Drawing properties in one panel. Drawing properties edit
+document metadata through native transactions; View controls local appearance
+and grid preferences. The legacy `drawingProperties` toolbar ID opens this same
+Settings panel; default controls use only `settings`. Hiding controls does not
+change native editing permissions or the SDK's `textEditing` policy.
 
 ## Development and verification
 

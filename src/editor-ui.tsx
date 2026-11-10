@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { MantineProvider, mergeThemeOverrides } from '@mantine/core';
+import { MantineProvider, MantineThemeProvider, mergeThemeOverrides } from '@mantine/core';
 import type { EditorInstance, EditorPreferences, EditorSelectionSnapshot, EditorState } from '@drawmotive/editor';
 import { callModel, projectSelection, selectionEdit, setModel } from './selection-model.js';
 import type { SelectionEdit, UiSelection } from './selection-model.js';
@@ -11,12 +11,11 @@ import { CreationTooltip } from './creation-tooltip.js';
 import { tooltipTheme } from './tooltip-theme.js';
 import { phosphorTheme } from './mantine-icons.js';
 import { EndpointIcon, Icon, PaletteIcon } from './icons.js';
-import { AlignPanel, Colors, EndpointPanel, GroupPanel, MorePanel, RoutingPanel, SettingsPanel, StrokePanel, TitlePanel } from './panels.js';
+import { AlignPanel, Colors, EndpointPanel, GroupPanel, MorePanel, RoutingPanel, StrokePanel, TitlePanel } from './panels.js';
 import { useEditorHotkeys } from './use-editor-hotkeys.js';
-import { DrawingPropertiesPanel } from './drawing-properties.js';
+import { SettingsPanel } from './settings.js';
 import { QuickInsert } from './quick-insert.js';
 import { createQuickInsertHistory, QUICK_INSERT_OBJECTS } from './quick-insert-model.js';
-import { useNativeTypography } from './use-native-typography.js';
 
 export interface EditorUiProps {
   editor: EditorInstance;
@@ -68,7 +67,8 @@ function EditorUiSession({editor,controller,container,slots={},colorScheme,class
   const [propertyEditToken,setPropertyEditToken]=useState<EditorSelectionSnapshot['token']|null>(null);
   const [quickInsert,setQuickInsert]=useState(false);
   const [insertHistory]=useState(()=>createQuickInsertHistory(()=>container.ownerDocument.defaultView!.localStorage));
-  const nativeFontFamily=useNativeTypography(container,!closed),fontFamily=style?.fontFamily??nativeFontFamily;
+  // Chrome uses Mantine typography; only an explicit host override may replace it.
+  const fontFamily=style?.fontFamily;
   const alive=useRef(false),pendingRef=useRef(new Set<string>()),overlay=useRef<HTMLDivElement>(null),toolbar=useRef<HTMLFieldSetElement>(null);
   const selectionRef=useRef<EditorSelectionSnapshot|null>(null);
   const stateRef=useRef<EditorState>(idle);
@@ -149,8 +149,8 @@ function EditorUiSession({editor,controller,container,slots={},colorScheme,class
     if(!ui.buttons[id as keyof typeof ui.buttons])return null;
     const disabled=(id==='undo'?!state.canUndo||editingBlocked:id==='redo'?!state.canRedo||editingBlocked:
       DRAWING_TOOL_IDS.some(tool=>tool===id)?editingBlocked:false);
-    if(id==='settings')return <PanelButton key={id} id="settings" button={<ToolButton icon={id}/>}> <SettingsPanel preferences={preferences} onChange={changePreferences}/></PanelButton>;
-    if(id==='drawingProperties')return <PanelButton key={id} id="drawingProperties" button={<ToolButton icon={id}/>}> <DrawingPropertiesPanel/></PanelButton>;
+    // Keep older host configurations working through the same Settings surface.
+    if(id==='settings'||id==='drawingProperties')return <PanelButton key={id} id={id} label="Settings" button={<ToolButton icon="settings"/>}> <SettingsPanel preferences={preferences} onChange={changePreferences}/></PanelButton>;
     if(id==='help')return <PanelButton key={id} id="help" button={<ToolButton icon={id}/>}> <div className="dm-help"><strong>Keyboard shortcuts</strong>{Object.entries(SHORTCUTS).map(([name,key])=><div key={name}>{LABELS[name]}<kbd>{key}</kbd></div>)}</div></PanelButton>;
     const invoke=()=>{
       if(id==='undo'||id==='redo')return editor[id]();
@@ -197,7 +197,9 @@ function EditorUiSession({editor,controller,container,slots={},colorScheme,class
     const panels:Record<string,ReactNode>={strokeFillColor:<Colors fill/>,strokeColor:<Colors/>,strokeStyle:<StrokePanel/>,textAlign:<AlignPanel/>,lineStartStyle:<EndpointPanel start/>,lineEndStyle:<EndpointPanel start={false}/>,lineRouting:<RoutingPanel/>,groupTheme:<GroupPanel/>,groupTitleStyle:<TitlePanel/>,moreOptions:<MorePanel copy={copy}/>};
     return <PanelButton key={id} id={id} button={button}>{panels[id]}</PanelButton>;
   }
+  // Reset inherited host overrides before this provider creates scoped CSS variables.
   return <div ref={overlay} className={'dm-editor-ui '+className} style={{fontFamily,...paletteStyle,...style}} data-mantine-color-scheme={scheme}>
+    <MantineThemeProvider inherit={false}>
     <MantineProvider forceColorScheme={scheme} theme={mergeThemeOverrides(phosphorTheme,tooltipTheme(scheme==='dark'),fontFamily?{fontFamily,headings:{fontFamily}}:{})} cssVariablesSelector=".dm-editor-ui" getRootElement={()=>overlay.current??undefined}>
       <UiContext.Provider value={context}>
         {Object.entries(ui.regions).map(([id,region])=>{const children=region.items.map(regionItem).filter(Boolean);return region.visible&&children.length>0?<ToolbarTooltipPosition.Provider key={id} value={id.startsWith('top')?'bottom':'top'}><div className={'dm-toolbar dm-corner dm-'+id} role="toolbar" aria-label={id+' toolbar'} data-region={id}>{children}</div></ToolbarTooltipPosition.Provider>:null;})}
@@ -220,5 +222,6 @@ function EditorUiSession({editor,controller,container,slots={},colorScheme,class
         {error!=null&&<div className="dm-error" role="alert"><span>{(error as {message?:string})?.message??String(error)}</span><ToolButton aria-label="Dismiss error" icon="close" onClick={()=>setError(null)}/></div>}
       </UiContext.Provider>
     </MantineProvider>
+    </MantineThemeProvider>
   </div>;
 }
