@@ -57,8 +57,8 @@
   },
   "dependencies": {
     "@drawmotive/editor": "0.3.3",
-    "@mantine/core": "9.7.4",
-    "@mantine/hooks": "9.7.4",
+    "@mantine/core": "9.8.1",
+    "@mantine/hooks": "9.8.1",
     "@phosphor-icons/react": "2.1.10"
   },
   "peerDependencies": {
@@ -66,7 +66,7 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0",
+    "@playwright/test": "1.65.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "esbuild": "0.28.2",
