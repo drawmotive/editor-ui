@@ -3,7 +3,7 @@ import {
   AlignBottomSimple, AlignCenterVerticalSimple, AlignTopSimple,
   ArrowBendRightUp, ArrowBendUpLeft, ArrowBendUpRight, ArrowDownRight,
   ArrowElbowRightUp, ArrowRight, ArrowUpRight,
-  Browser, Circle, Cloud, Copy, Cursor, Diamond, DotsThreeVertical, GearSix,
+  Browser, Circle, Cloud, Copy, Cursor, Diamond, DotsThreeVertical, GearSix, Hash,
   MagnifyingGlass, MagnifyingGlassMinus, MagnifyingGlassPlus, Minus,
   Palette, Path, Pill, Prohibit, Question, Rectangle, Scribble, Star,
   TextAlignCenter, TextAlignLeft, TextAlignRight, TextB, Textbox, TextItalic, TextT, Trash, X,
@@ -23,7 +23,7 @@ const icons: Record<string, PhosphorIcon> = {
   textAlignTop: AlignTopSimple, textAlignMiddle: AlignCenterVerticalSimple, textAlignBottom: AlignBottomSimple,
   lineRouting: Path,
   routingStraight: ArrowUpRight, routingOrthogonal: ArrowElbowRightUp, routingCurved: ArrowBendRightUp,
-  groupTheme: Browser, groupTitleStyle: Textbox, moreOptions: DotsThreeVertical,
+  groupTheme: Browser, groupTitleStyle: Textbox, numbering: Hash, moreOptions: DotsThreeVertical,
   copy: Copy, delete: Trash, close: X, transparent: Prohibit,
 };
 

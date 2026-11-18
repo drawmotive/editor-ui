@@ -1,11 +1,20 @@
 export const CONTEXT_TOOL_IDS = Object.freeze(['strokeFillColor','strokeColor','strokeStyle','cornerRadius','editText',
   'textSizeSmall','textSizeMedium','textSizeLarge','bold','italic','textAlign','lineStartStyle','lineEndStyle',
-  'swapLineEndpoints','lineRouting','groupTheme','groupTitleStyle','moreOptions']);
+  'swapLineEndpoints','lineRouting','groupTheme','groupTitleStyle','numbering','moreOptions']);
 export const CONTEXT_PANEL_IDS = Object.freeze(['strokeFillColor','strokeColor','strokeStyle','textAlign',
-  'lineStartStyle','lineEndStyle','lineRouting','groupTitleStyle','moreOptions']);
+  'lineStartStyle','lineEndStyle','lineRouting','groupTitleStyle','numbering','moreOptions']);
 export function selectionSubjects(items) {
   const focused = items.length === 2 && items.find(item => item.kind === 'BoundText' && items.some(owner => owner.id === item.bindingItemId));
   return focused ? [focused] : items;
+}
+
+/** A native numbering snapshot identifies eligible objects and supplies the current range. */
+export function itemNumbering(item) {
+  const value = item.resolved?.numbering;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+  const { number, prefix, maximum, drawingEnabled } = value;
+  if ((number === null || (Number.isSafeInteger(number) && number > 0)) && typeof prefix === 'string' &&
+      Number.isSafeInteger(maximum) && maximum >= 0 && typeof drawingEnabled === 'boolean') return value;
 }
 
 /** Use only immutable capability summaries. Mixed selections must support every action. */
@@ -26,8 +35,9 @@ export function contextTools(items, options) {
     if (all('stroke')) tools.push('strokeStyle');
     if (all('cornerRadius')) tools.push('cornerRadius');
   }
+  // Text and number editing both need one effective target.
   if (all('editText') && items.length === 1) tools.push('editText');
-  // Multi-selection text editing has no unambiguous single inline target.
+  if (items.length === 1 && itemNumbering(items[0])) tools.push('numbering');
   tools.push('moreOptions');
   return tools.filter(id => (!options.tools || options.tools.includes(id)) &&
     (!CONTEXT_PANEL_IDS.includes(id) || !options.panels || options.panels.includes(id)));

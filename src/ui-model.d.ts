@@ -2,7 +2,14 @@ import type { EditorSelectedObject, EditorScreenBounds } from '@drawmotive/edito
 import type { NormalizedUiOptions } from './ui-options.js';
 export declare const CONTEXT_TOOL_IDS: readonly string[];
 export declare const CONTEXT_PANEL_IDS: readonly string[];
-export declare function selectionSubjects(items: readonly EditorSelectedObject[]): readonly EditorSelectedObject[];
+export declare function selectionSubjects<T extends EditorSelectedObject>(items: readonly T[]): readonly T[];
+export interface ItemNumbering {
+  readonly number: number | null;
+  readonly prefix: string;
+  readonly maximum: number;
+  readonly drawingEnabled: boolean;
+}
+export declare function itemNumbering(item: EditorSelectedObject): ItemNumbering | undefined;
 export declare function contextTools(items: readonly EditorSelectedObject[], options: NormalizedUiOptions['contextToolbar']): string[];
 export declare function placeFloating(anchor: EditorScreenBounds, size: {width:number;height:number}, viewport: {width:number;height:number}): {left:number;top:number};
 export declare function mapCanvasBounds(bounds: EditorScreenBounds, canvas: EditorScreenBounds & {width:number;height:number}, canvasSize: {width:number;height:number}, host: EditorScreenBounds & {width:number;height:number}, hostSize: {width:number;height:number}): EditorScreenBounds;

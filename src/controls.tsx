@@ -24,7 +24,7 @@ export const LABELS: Record<string, string> = {
   zoomIn:'Zoom in',zoomOut:'Zoom out',resetZoom:'Reset zoom',settings:'Settings',drawingProperties:'Drawing properties',help:'Help',strokeFillColor:'Border and Fill Color',
   strokeColor:'Color',strokeStyle:'Line style',cornerRadius:'Round corners',editText:'Edit text',textSizeSmall:'Small text',textSizeMedium:'Medium text',textSizeLarge:'Large text',
   bold:'Bold',italic:'Italic',textAlign:'Text alignment',lineStartStyle:'Start style',lineEndStyle:'End style',swapLineEndpoints:'Swap endpoints',lineRouting:'Connector type',
-  groupTheme:'Group theme',groupTitleStyle:'Title style',moreOptions:'More options',
+  groupTheme:'Group theme',groupTitleStyle:'Title style',numbering:'Numbering',moreOptions:'More options',
   copy:'Copy selection',paste:'Paste selection',delete:'Delete selection',cancel:'Cancel interaction',pan:'Pan canvas',quickInsert:'Quick insert',
 };
 export const SHORTCUTS: Record<string,string> = {undo:'Ctrl/⌘ Z',redo:'Ctrl/⌘ Shift Z',arrow:'A',rectangle:'R',ellipse:'O',diamond:'D',text:'T',sketchyMode:'S',bold:'Ctrl/⌘ B',italic:'Ctrl/⌘ I',editText:'Enter',copy:'Ctrl/⌘ C',paste:'Ctrl/⌘ V',delete:'Delete',cancel:'Escape',pan:'Space (hold)',quickInsert:'/'};

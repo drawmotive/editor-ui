@@ -14,6 +14,7 @@ import { EndpointIcon, Icon, PaletteIcon } from './icons.js';
 import { AlignPanel, Colors, EndpointPanel, GroupPanel, MorePanel, RoutingPanel, StrokePanel, TitlePanel } from './panels.js';
 import { useEditorHotkeys } from './use-editor-hotkeys.js';
 import { SettingsPanel } from './settings.js';
+import { NumberingPanel } from './numbering.js';
 import { QuickInsert } from './quick-insert.js';
 import { createQuickInsertHistory, QUICK_INSERT_OBJECTS } from './quick-insert-model.js';
 
@@ -194,7 +195,7 @@ function EditorUiSession({editor,controller,container,slots={},colorScheme,class
     const button=<ToolButton icon={id} data-testid={testId} selected={selected} shortcut={SHORTCUTS[id]} disabled={id==='swapLineEndpoints'&&p.lineStartStyle.state==='Uniform'&&p.lineEndStyle.state==='Uniform'&&uniform(p.lineStartStyle)===uniform(p.lineEndStyle)}
       onClick={isPanel?undefined:()=>void direct()}>{content}</ToolButton>;
     if(!isPanel)return <span key={id}>{button}</span>;
-    const panels:Record<string,ReactNode>={strokeFillColor:<Colors fill/>,strokeColor:<Colors/>,strokeStyle:<StrokePanel/>,textAlign:<AlignPanel/>,lineStartStyle:<EndpointPanel start/>,lineEndStyle:<EndpointPanel start={false}/>,lineRouting:<RoutingPanel/>,groupTheme:<GroupPanel/>,groupTitleStyle:<TitlePanel/>,moreOptions:<MorePanel copy={copy}/>};
+    const panels:Record<string,ReactNode>={strokeFillColor:<Colors fill/>,strokeColor:<Colors/>,strokeStyle:<StrokePanel/>,textAlign:<AlignPanel/>,lineStartStyle:<EndpointPanel start/>,lineEndStyle:<EndpointPanel start={false}/>,lineRouting:<RoutingPanel/>,groupTheme:<GroupPanel/>,groupTitleStyle:<TitlePanel/>,numbering:<NumberingPanel item={item}/>,moreOptions:<MorePanel copy={copy}/>};
     return <PanelButton key={id} id={id} button={button}>{panels[id]}</PanelButton>;
   }
   // Reset inherited host overrides before this provider creates scoped CSS variables.
