@@ -145,12 +145,12 @@ test('drawing numbering uses saved metadata and resets group descendants only wh
   ]);
 });
 
-test('group numbering retains its editable setting when drawing numbering is off and resets its own scope', async ({ page }) => {
+test('group numbering can be toggled independently and resets its own scope', async ({ page }) => {
   const token = await selectNumbered(page, 'Group', { number: null, prefix: '', maximum: 1, drawingEnabled: false }, true);
   const panel = await openNumbering(page);
   const automatic = panel.getByRole('checkbox', { name: 'Automatic numbering', exact: true });
   await expect(automatic).toBeChecked();
-  await expect(automatic).toHaveAccessibleDescription('Enable drawing-wide automatic numbering to use this setting.');
+  await expect(automatic).toHaveAccessibleDescription('');
   await automatic.uncheck();
   await panel.getByRole('checkbox', { name: 'Include group descendants', exact: true }).check();
   await panel.getByRole('button', { name: 'Reset numbering', exact: true }).click();

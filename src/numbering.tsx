@@ -32,7 +32,6 @@ export function NumberingPanel({ item }: { item: UiSelectedObject }) {
     {item.capabilities.group && typeof autoNumber === 'boolean' && <>
       <Divider/>
       <Checkbox label="Automatic numbering" size="xs" checked={autoNumber} disabled={disabled}
-        description={numbering.drawingEnabled ? undefined : 'Enable drawing-wide automatic numbering to use this setting.'}
         onChange={event => {
           const checked = event.currentTarget.checked;
           void edit('Change group automatic numbering', target => [setModel(target, ['autoNumber'], checked)], item);
