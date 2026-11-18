@@ -1,21 +1,17 @@
 import { useState } from 'react';
-import { Button, Checkbox, Divider, Group, NativeSelect, Stack, TextInput } from '@mantine/core';
+import { Button, Checkbox, Divider, Group, NativeSelect, TextInput } from '@mantine/core';
 import { useUi } from './controls.js';
 import { callModel, setModel, type UiSelectedObject } from './selection-model.js';
 import { itemNumbering, type ItemNumbering } from './ui-model.js';
 
 export function ResetNumbering({ disabled, onReset }: {
   disabled: boolean;
-  onReset: (includeGroups: boolean) => Promise<unknown>;
+  onReset: () => Promise<unknown>;
 }) {
-  const [includeGroups, setIncludeGroups] = useState(false);
-  return <Stack gap={6} align="flex-start">
-    <Checkbox label="Include group descendants" size="xs" checked={includeGroups} disabled={disabled}
-      onChange={event => setIncludeGroups(event.currentTarget.checked)}/>
-    <Button size="compact-xs" variant="default" disabled={disabled} onClick={() => void onReset(includeGroups)}>
-      Reset numbering
-    </Button>
-  </Stack>;
+  return <Button size="compact-xs" variant="default" disabled={disabled} style={{ alignSelf: 'flex-start' }}
+    onClick={() => void onReset()}>
+    Reset numbering
+  </Button>;
 }
 
 /** Each draft belongs to the revision that supplied the displayed prefix and range. */
@@ -43,8 +39,8 @@ export function NumberingPanel({ item }: { item: UiSelectedObject }) {
           onChange={event => void changeGroupAutoNumber(event.currentTarget.value)}/>
         : <Checkbox label={groupLabel} size="xs" checked={autoNumber === true} disabled={disabled}
           onChange={event => void changeGroupAutoNumber(event.currentTarget.checked)}/>}
-      <ResetNumbering disabled={disabled} onReset={includeGroups =>
-        edit('Reset group numbering', target => [callModel(target, 'resetNumbering', includeGroups)], item)}/>
+      <ResetNumbering disabled={disabled} onReset={() =>
+        edit('Reset group numbering', target => [callModel(target, 'resetNumbering', false)], item)}/>
     </>}
   </div>;
 }

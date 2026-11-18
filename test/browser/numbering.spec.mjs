@@ -119,7 +119,7 @@ test('number editing waits for a selection snapshot at the current revision', as
   await expect(fresh.getByLabel('Local number', { exact: true })).toHaveValue('1');
 });
 
-test('drawing numbering uses saved metadata and resets group descendants only when requested', async ({ page }) => {
+test('drawing numbering uses saved metadata and resets only direct members', async ({ page }) => {
   await page.evaluate(() => instances[0].setDrawingAutoNumber(false));
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   const drawing = page.getByRole('region', { name: 'Drawing', exact: true });
@@ -130,21 +130,14 @@ test('drawing numbering uses saved metadata and resets group descendants only wh
   await expect(automatic).not.toBeChecked();
   await automatic.check();
   await expect(automatic).toBeChecked();
-  await expect(descendants).not.toBeChecked();
+  await expect(descendants).toHaveCount(0);
   await expect(reset).toHaveCSS('border-top-style', 'solid');
-  const descendantsBounds = await descendants.boundingBox();
-  const resetBounds = await reset.boundingBox();
-  expect(resetBounds.y).toBeGreaterThan(descendantsBounds.y + descendantsBounds.height);
-  await reset.click();
-  await descendants.check();
   await reset.click();
   await expect.poll(() => calls(page)).toEqual([
     { method: 'editScene', args: [{ revision: 'r1', description: 'Change automatic numbering',
       changes: [{ path: ['autoNumber'], value: true }] }] },
     { method: 'editScene', args: [{ revision: 'r2', description: 'Reset numbering',
       changes: [{ op: 'call', path: ['resetNumbering'], arguments: [false] }] }] },
-    { method: 'editScene', args: [{ revision: 'r3', description: 'Reset numbering',
-      changes: [{ op: 'call', path: ['resetNumbering'], arguments: [true] }] }] },
   ]);
 });
 
@@ -158,13 +151,13 @@ test('group numbering exposes three saved modes and resets its own scope', async
   await automatic.selectOption('Enable');
   await automatic.selectOption('Disable');
   await automatic.selectOption('Inherit');
-  await panel.getByRole('checkbox', { name: 'Include group descendants', exact: true }).check();
+  await expect(panel.getByRole('checkbox', { name: 'Include group descendants', exact: true })).toHaveCount(0);
   await panel.getByRole('button', { name: 'Reset numbering', exact: true }).click();
   await expect.poll(() => calls(page)).toEqual([
     ...['Enable', 'Disable', 'Inherit'].map((value, index) => ({ method: 'editScene', args: [{ revision: 'r' + index,
       description: 'Change group automatic numbering', token, changes: [{ itemId: 'Group', path: ['autoNumberMode'], value }] }] })),
     { method: 'editScene', args: [{ revision: 'r3', description: 'Reset group numbering', token,
-      changes: [{ itemId: 'Group', op: 'call', path: ['resetNumbering'], arguments: [true] }] }] },
+      changes: [{ itemId: 'Group', op: 'call', path: ['resetNumbering'], arguments: [false] }] }] },
   ]);
 });
 

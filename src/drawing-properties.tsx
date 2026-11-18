@@ -48,7 +48,7 @@ export function DrawingPropertiesPanel() {
       <Checkbox label="Automatic numbering in this diagram" size="xs" checked={autoNumber} disabled={disabled}
         onChange={event=>void edit('Change automatic numbering',{path:['autoNumber'],value:event.currentTarget.checked})}/>
       <ResetNumbering disabled={disabled}
-        onReset={includeGroups=>edit('Reset numbering',{op:'call',path:['resetNumbering'],arguments:[includeGroups]})}/>
+        onReset={()=>edit('Reset numbering',{op:'call',path:['resetNumbering'],arguments:[false]})}/>
     </>}
     {error!=null&&<div role="alert"><p>{(error as {message?:string})?.message??String(error)}</p>
       <ToolButton aria-label="Read drawing properties again" onClick={()=>{requestedRevision.current=null;setRetry(value=>value+1);}}>Try again</ToolButton>
