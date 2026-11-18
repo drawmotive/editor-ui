@@ -58,7 +58,10 @@ function LocalNumberEditor({ numbering: { number, prefix, maximum }, disabled, o
     if (canApply) void onChange(value);
   }}>
     <TextInput label="Local number" size="xs" value={draft} inputMode="numeric" disabled={disabled || maximum < 1}
-      description={prefix && 'Group prefix ' + prefix}
+      leftSection={prefix && <span className="dm-number-prefix" data-testid="number-prefix" aria-hidden="true">{prefix}</span>}
+      leftSectionWidth={prefix ? `clamp(1.75rem, calc(${prefix.length}ch + .75rem), 60%)` : undefined}
+      leftSectionPointerEvents="none"
+      description={prefix && 'Group prefix ' + prefix} descriptionProps={{ style: { display: 'none' } }}
       error={draft !== saved && draft !== '' && !valid && 'Enter a whole number from 1 to ' + maximum + '.'}
       onChange={event => setDraft(event.currentTarget.value)}/>
     <Group gap={6}>

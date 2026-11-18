@@ -5,6 +5,10 @@
 @import '@mantine/core/styles/Input.css';
 @import '@mantine/core/styles/InlineInput.css';
 @import '@mantine/core/styles/Checkbox.css';
+@import '@mantine/core/styles/Button.css';
+@import '@mantine/core/styles/Divider.css';
+@import '@mantine/core/styles/Group.css';
+@import '@mantine/core/styles/Stack.css';
 
 .dm-phosphor-loader{display:block;flex-shrink:0;animation:dm-phosphor-spin .8s linear infinite}
 @keyframes dm-phosphor-spin{to{transform:rotate(360deg)}}
@@ -48,7 +52,7 @@
 .dm-settings-section-heading p{margin:0;padding:2px 6px;border:1px solid var(--dm-border);border-radius:4px;background:var(--dm-header);color:var(--dm-text);font-size:11px;font-weight:500;line-height:1.4;white-space:nowrap}
 .dm-panel-row{display:flex;align-items:center;flex-wrap:wrap;gap:5px;padding:2px}.dm-panel-stack{display:flex;flex-direction:column;gap:8px;min-width:165px;max-width:300px;padding:3px;}
 .dm-panel-stack.dm-numbering-panel{width:230px;max-width:calc(100cqw - 26px);min-width:0}
-.dm-numbering-panel .mantine-InputWrapper-description{overflow-wrap:anywhere}
+.dm-number-prefix{max-width:calc(100% - 6px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--mantine-font-size-xs);}
 .dm-group-controls,.dm-title-controls{display:flex;align-items:center;gap:5px;flex-wrap:wrap;max-width:100%;}.dm-group-controls .mantine-NativeSelect-root{width:140px}.dm-group-controls .mantine-NativeSelect-root:last-child{width:180px}
 .dm-endpoint-grid{display:grid;grid-template-columns:repeat(3,34px);gap:5px}.dm-editor-ui .dm-menu-item{justify-content:flex-start;width:100%;padding-inline:7px;}
 .dm-editor-ui .dm-button-group{display:inline-flex;border:1px solid var(--dm-border);border-radius:4px;overflow:hidden;}

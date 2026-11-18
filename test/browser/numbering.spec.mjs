@@ -32,9 +32,23 @@ test('number editing shows the group prefix and submits only a valid local value
   const panel = await openNumbering(page);
   const input = panel.getByLabel('Local number', { exact: true });
   const apply = panel.getByRole('button', { name: 'Apply', exact: true });
-  await expect(panel.getByText('Group prefix 2.3.', { exact: true })).toBeVisible();
+  const prefix = panel.getByTestId('number-prefix');
+  await expect(prefix).toBeVisible();
+  await expect(prefix).toHaveText('2.3.');
+  await expect(input).toHaveAccessibleDescription('Group prefix 2.3.');
+  await expect(panel.getByText('Group prefix 2.3.', { exact: true })).toBeHidden();
+  const prefixBounds = await prefix.boundingBox();
+  const inputBounds = await input.boundingBox();
+  expect(prefixBounds.x).toBeGreaterThan(inputBounds.x);
+  expect(prefixBounds.y).toBeGreaterThan(inputBounds.y);
+  expect(prefixBounds.y + prefixBounds.height).toBeLessThan(inputBounds.y + inputBounds.height);
   await expect(input).toHaveValue('2');
   await expect(apply).toBeDisabled();
+  const clear = panel.getByRole('button', { name: 'Clear', exact: true });
+  const applyBounds = await apply.boundingBox();
+  const clearBounds = await clear.boundingBox();
+  expect(clearBounds.x).toBeGreaterThan(applyBounds.x + applyBounds.width);
+  await expect(clear).toHaveCSS('border-top-style', 'solid');
   for (const invalid of ['', '0', '5', '2.5']) {
     await input.fill(invalid);
     await expect(apply).toBeDisabled();
@@ -48,7 +62,7 @@ test('number editing shows the group prefix and submits only a valid local value
       changes: [{ itemId: 'Shape', op: 'call', path: ['setBadgeNumber'], arguments: [4] }] }] },
   ]);
   await expect(input).toHaveValue('4');
-  await panel.getByRole('button', { name: 'Clear', exact: true }).click();
+  await clear.click();
   await expect.poll(() => calls(page)).toEqual([
     { method: 'editScene', args: [{ revision: 'r0', description: 'Change badge number', token,
       changes: [{ itemId: 'Shape', op: 'call', path: ['setBadgeNumber'], arguments: [4] }] }] },
@@ -114,6 +128,10 @@ test('drawing numbering uses saved metadata and resets group descendants only wh
   await automatic.check();
   await expect(automatic).toBeChecked();
   await expect(descendants).not.toBeChecked();
+  await expect(reset).toHaveCSS('border-top-style', 'solid');
+  const descendantsBounds = await descendants.boundingBox();
+  const resetBounds = await reset.boundingBox();
+  expect(resetBounds.y).toBeGreaterThan(descendantsBounds.y + descendantsBounds.height);
   await reset.click();
   await descendants.check();
   await reset.click();
