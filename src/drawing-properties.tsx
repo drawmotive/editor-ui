@@ -45,7 +45,7 @@ export function DrawingPropertiesPanel() {
     <p className="dm-property-description">{style==='1'?'Hand-drawn strokes and handwriting.':'Precise strokes and clean typography.'}</p>
     {typeof autoNumber==='boolean'&&<>
       <Divider/>
-      <Checkbox label="Automatic numbering" size="xs" checked={autoNumber} disabled={disabled}
+      <Checkbox label="Automatic numbering in this diagram" size="xs" checked={autoNumber} disabled={disabled}
         onChange={event=>void edit('Change automatic numbering',{path:['autoNumber'],value:event.currentTarget.checked})}/>
       <ResetNumbering disabled={disabled}
         onReset={includeGroups=>edit('Reset numbering',{op:'call',path:['resetNumbering'],arguments:[includeGroups]})}/>

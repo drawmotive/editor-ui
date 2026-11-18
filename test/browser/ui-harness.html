@@ -48,7 +48,7 @@ globalThis.mount = (options={},fontFamily)=>{
    const item=selection.items.find(item=>item.id===change.itemId);
    if(!item?.resolved.numbering)continue;
    let next;
-   if(property==='autoNumber')next={...item,model:{...item.model,autoNumber:change.value}};
+   if(property==='autoNumber'||property==='autoNumberMode')next={...item,model:{...item.model,[property]:change.value}};
    if(property==='setBadgeNumber')next={...item,resolved:{...item.resolved,numbering:{...item.resolved.numbering,number:change.arguments[0]}}};
    if(next){selection={...selection,items:selection.items.map(value=>value===item?next:value)};changed=true;}
   }

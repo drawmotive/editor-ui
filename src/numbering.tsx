@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Checkbox, Divider, Group, Stack, TextInput } from '@mantine/core';
+import { Button, Checkbox, Divider, Group, NativeSelect, Stack, TextInput } from '@mantine/core';
 import { useUi } from './controls.js';
 import { callModel, setModel, type UiSelectedObject } from './selection-model.js';
 import { itemNumbering, type ItemNumbering } from './ui-model.js';
@@ -25,17 +25,24 @@ export function NumberingPanel({ item }: { item: UiSelectedObject }) {
   if (!selection || !numbering) return null;
   const disabled = selection.revision !== state.revision || state.busy || !state.editingEnabled || state.health !== 'healthy';
   const autoNumber = item.model.autoNumber;
+  const mode = item.model.autoNumberMode;
+  const hasMode = mode === 'Enable' || mode === 'Disable' || mode === 'Inherit';
+  const groupLabel = 'Automatic numbering in group';
+  const changeGroupAutoNumber = (value: string | boolean) => edit('Change group automatic numbering',
+    target => [setModel(target, [hasMode ? 'autoNumberMode' : 'autoNumber'], value)], item);
   return <div className="dm-panel-stack dm-numbering-panel">
     <LocalNumberEditor key={selection.revision} numbering={numbering} disabled={disabled}
       onChange={value => edit(value === null ? 'Clear badge number' : 'Change badge number',
         target => [callModel(target, 'setBadgeNumber', value)], item)}/>
-    {item.capabilities.group && typeof autoNumber === 'boolean' && <>
+    {item.capabilities.group && (hasMode || typeof autoNumber === 'boolean') && <>
       <Divider/>
-      <Checkbox label="Automatic numbering" size="xs" checked={autoNumber} disabled={disabled}
-        onChange={event => {
-          const checked = event.currentTarget.checked;
-          void edit('Change group automatic numbering', target => [setModel(target, ['autoNumber'], checked)], item);
-        }}/>
+      {hasMode
+        ? <NativeSelect label={groupLabel} size="xs" value={mode} disabled={disabled}
+          data={[{ value: 'Enable', label: 'Enable' }, { value: 'Disable', label: 'Disable' },
+            { value: 'Inherit', label: 'Inherit parent' }]}
+          onChange={event => void changeGroupAutoNumber(event.currentTarget.value)}/>
+        : <Checkbox label={groupLabel} size="xs" checked={autoNumber === true} disabled={disabled}
+          onChange={event => void changeGroupAutoNumber(event.currentTarget.checked)}/>}
       <ResetNumbering disabled={disabled} onReset={includeGroups =>
         edit('Reset group numbering', target => [callModel(target, 'resetNumbering', includeGroups)], item)}/>
     </>}

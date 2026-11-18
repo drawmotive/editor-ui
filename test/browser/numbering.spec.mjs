@@ -19,12 +19,12 @@ async function openNumbering(page) {
   return numberingDialog(page);
 }
 
-async function selectNumbered(page, kind, numbering, autoNumber) {
-  return page.evaluate(async ({ kind, numbering, autoNumber }) => {
+async function selectNumbered(page, kind, numbering, model = {}) {
+  return page.evaluate(async ({ kind, numbering, model }) => {
     const instance = instances[0];
-    instance.select(kind, { resolved: { numbering }, model: { autoNumber } });
+    instance.select(kind, { resolved: { numbering }, model });
     return (await instance.editor.getSelection()).token;
-  }, { kind, numbering, autoNumber });
+  }, { kind, numbering, model });
 }
 
 test('number editing shows the group prefix and submits only a valid local value', async ({ page }) => {
@@ -78,8 +78,11 @@ test('an eligible unnumbered shape accepts a manual number with automatic number
   const input = panel.getByLabel('Local number', { exact: true });
   await expect(input).toHaveValue('');
   await expect(panel.getByRole('button', { name: 'Clear', exact: true })).toBeDisabled();
+  const apply = panel.getByRole('button', { name: 'Apply', exact: true });
+  await input.fill('2');
+  await expect(apply).toBeDisabled();
   await input.fill('1');
-  await panel.getByRole('button', { name: 'Apply', exact: true }).click();
+  await apply.click();
   await expect.poll(() => calls(page)).toEqual([
     { method: 'editScene', args: [{ revision: 'r0', description: 'Change badge number', token,
       changes: [{ itemId: 'Shape', op: 'call', path: ['setBadgeNumber'], arguments: [1] }] }] },
@@ -120,7 +123,7 @@ test('drawing numbering uses saved metadata and resets group descendants only wh
   await page.evaluate(() => instances[0].setDrawingAutoNumber(false));
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   const drawing = page.getByRole('region', { name: 'Drawing', exact: true });
-  const automatic = drawing.getByRole('checkbox', { name: 'Automatic numbering', exact: true });
+  const automatic = drawing.getByRole('checkbox', { name: 'Automatic numbering in this diagram', exact: true });
   const descendants = drawing.getByRole('checkbox', { name: 'Include group descendants', exact: true });
   const reset = drawing.getByRole('button', { name: 'Reset numbering', exact: true });
   await expect(automatic).toBeEnabled();
@@ -145,20 +148,37 @@ test('drawing numbering uses saved metadata and resets group descendants only wh
   ]);
 });
 
-test('group numbering can be toggled independently and resets its own scope', async ({ page }) => {
-  const token = await selectNumbered(page, 'Group', { number: null, prefix: '', maximum: 1, drawingEnabled: false }, true);
+test('group numbering exposes three saved modes and resets its own scope', async ({ page }) => {
+  const token = await selectNumbered(page, 'Group', { number: null, prefix: '', maximum: 1, drawingEnabled: false },
+    { autoNumber: false, autoNumberMode: 'Inherit' });
   const panel = await openNumbering(page);
-  const automatic = panel.getByRole('checkbox', { name: 'Automatic numbering', exact: true });
-  await expect(automatic).toBeChecked();
-  await expect(automatic).toHaveAccessibleDescription('');
-  await automatic.uncheck();
+  const automatic = panel.getByRole('combobox', { name: 'Automatic numbering in group', exact: true });
+  await expect(automatic).toHaveValue('Inherit');
+  await expect(automatic.getByRole('option')).toHaveText(['Enable', 'Disable', 'Inherit parent']);
+  await automatic.selectOption('Enable');
+  await automatic.selectOption('Disable');
+  await automatic.selectOption('Inherit');
   await panel.getByRole('checkbox', { name: 'Include group descendants', exact: true }).check();
   await panel.getByRole('button', { name: 'Reset numbering', exact: true }).click();
   await expect.poll(() => calls(page)).toEqual([
+    ...['Enable', 'Disable', 'Inherit'].map((value, index) => ({ method: 'editScene', args: [{ revision: 'r' + index,
+      description: 'Change group automatic numbering', token, changes: [{ itemId: 'Group', path: ['autoNumberMode'], value }] }] })),
+    { method: 'editScene', args: [{ revision: 'r3', description: 'Reset group numbering', token,
+      changes: [{ itemId: 'Group', op: 'call', path: ['resetNumbering'], arguments: [true] }] }] },
+  ]);
+});
+
+test('group numbering retains the Boolean control for an older runtime', async ({ page }) => {
+  const token = await selectNumbered(page, 'Group', { number: null, prefix: '', maximum: 1, drawingEnabled: false },
+    { autoNumber: true });
+  const panel = await openNumbering(page);
+  const automatic = panel.getByRole('checkbox', { name: 'Automatic numbering in group', exact: true });
+  await expect(automatic).toBeChecked();
+  await automatic.uncheck();
+  await expect(automatic).not.toBeChecked();
+  await expect.poll(() => calls(page)).toEqual([
     { method: 'editScene', args: [{ revision: 'r0', description: 'Change group automatic numbering', token,
       changes: [{ itemId: 'Group', path: ['autoNumber'], value: false }] }] },
-    { method: 'editScene', args: [{ revision: 'r1', description: 'Reset group numbering', token,
-      changes: [{ itemId: 'Group', op: 'call', path: ['resetNumbering'], arguments: [true] }] }] },
   ]);
 });
 
@@ -169,6 +189,6 @@ test('numbering controls stay hidden when the runtime omits numbering metadata',
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   const drawing = page.getByRole('region', { name: 'Drawing', exact: true });
   await expect(drawing.getByLabel('Theme', { exact: true })).toBeEnabled();
-  await expect(drawing.getByRole('checkbox', { name: 'Automatic numbering', exact: true })).toHaveCount(0);
+  await expect(drawing.getByRole('checkbox', { name: 'Automatic numbering in this diagram', exact: true })).toHaveCount(0);
   await expect(drawing.getByRole('button', { name: 'Reset numbering', exact: true })).toHaveCount(0);
 });
