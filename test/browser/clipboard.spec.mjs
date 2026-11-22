@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { png } from '../fixtures/clipboard-image.mjs';
 
 test.use({ launchOptions: { executablePath: process.env.DRAWMOTIVE_CHROMIUM_PATH } });
 test.beforeEach(async ({ page }) => {
@@ -17,7 +18,13 @@ test.beforeEach(async ({ page }) => {
       clipboard: {
         write(items) {
           access.push({ method: 'write', active: navigator.userActivation.isActive });
-          return items[0].getType('text/plain').then(blob => blob.text()).then(text => { globalThis.copiedText = text; });
+          const [item] = items;
+          return Promise.all([
+            item.getType('text/plain').then(blob => blob.text()).then(text => { globalThis.copiedText = text; }),
+            item.getType('image/png').then(blob => blob.arrayBuffer()).then(buffer => {
+              globalThis.copiedPng = [...new Uint8Array(buffer)];
+            }),
+          ]);
         },
         readText() { access.push({ method: 'read', active: navigator.userActivation.isActive }); return Promise.resolve(copiedText); },
       }, ClipboardItem, Blob, getPastePosition: () => Promise.resolve({ x: 12, y: 34 }),
@@ -38,8 +45,10 @@ for (const trigger of ['shortcut', 'menu']) test(`${trigger} starts system copy 
   expect(await page.evaluate(() => access)).toEqual([{ method: 'write', active: true }]);
   expect(await page.evaluate(() => captures.length)).toBe(1);
   expect(await page.evaluate(() => typeof copiedText)).toBe('undefined');
+  expect(await page.evaluate(() => typeof copiedPng)).toBe('undefined');
   await page.evaluate(async () => { const { png } = await import('/test/fixtures/clipboard-image.mjs'); finishCopy({ version: 2, data: Uint8Array.of(1, 2, 3), png }); });
   await expect.poll(() => page.evaluate(() => globalThis.copiedText)).toBe('drawmotive/selection:2\nAQID');
+  await expect.poll(() => page.evaluate(() => globalThis.copiedPng)).toEqual([...png]);
   await page.locator('canvas').press('Control+v');
   await expect.poll(() => page.evaluate(() => pasted.map(({ payload, point }) => ({ payload: { version: payload.version, data: [...payload.data] }, point }))))
     .toEqual([{ payload: { version: 2, data: [1, 2, 3] }, point: { x: 12, y: 34 } }]);
