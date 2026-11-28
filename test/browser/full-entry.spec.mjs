@@ -21,6 +21,50 @@ test('host preference changes update React appearance and the settings controls'
  await page.evaluate(()=>editor.dispose());
 });
 
+test('object-drop layout shows progress only after 500 ms and clears when finished', async ({ page }) => {
+  await page.evaluate(async () => {
+    const { createEditor } = await import('/sdk/src/index.js');
+    const { mountEditorUi } = await import('/dist/standalone.js');
+    const container = document.createElement('div');
+    container.className = 'editor';
+    document.body.append(container);
+    globalThis.editor = await createEditor({ container, assetBaseUrl: new URL('/stub-runtime/', location.href) });
+    mountEditorUi({ editor, container });
+  });
+  await expect(page.getByRole('button', { name: 'Rectangle', exact: true })).toBeVisible();
+  const canvas = page.locator('.drawmotive-canvas-host canvas');
+  const status = page.getByTestId('object-drop-layout');
+  const updateLayout = detail => canvas.evaluate((element, detail) => {
+    element.dispatchEvent(new CustomEvent('drawmotive:object-drop-layout', { bubbles: true, detail }));
+  }, detail);
+  const start = new Date();
+  await page.clock.install({ time: start });
+  await page.clock.pauseAt(new Date(start.getTime() + 1000));
+
+  await updateLayout(300);
+  await page.clock.runFor(199);
+  await expect(status).toHaveCount(0);
+  await updateLayout(null);
+  await page.clock.runFor(500);
+  await expect(status).toHaveCount(0);
+
+  await updateLayout(350);
+  await page.clock.runFor(150);
+  await expect(page.getByRole('status', { name: 'Updating layout' })).toBeVisible({ timeout: 2000 });
+  await expect(status).toHaveCSS('pointer-events', 'none');
+  await updateLayout(null);
+  await expect(status).toHaveCount(0);
+
+  await updateLayout(600);
+  await expect(status).toBeVisible();
+  await page.evaluate(() => {
+    globalThis.nativeCleanup = () => new Promise(resolve => { globalThis.finishDisposal = resolve; });
+    globalThis.disposal = editor.dispose();
+  });
+  await expect(status).toHaveCount(0);
+  await page.evaluate(async () => { finishDisposal(); await disposal; });
+});
+
 for (const ui of [false, { enabled: false }]) test(`private composition retains Mantine hotkeys with ui=${JSON.stringify(ui)}`, async ({ page }) => {
  await page.evaluate(async ui => {
   const { createEditor } = await import('/sdk/src/index.js');

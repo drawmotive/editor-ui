@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { MantineProvider, MantineThemeProvider, mergeThemeOverrides } from '@mantine/core';
+import { Loader, MantineProvider, MantineThemeProvider, mergeThemeOverrides } from '@mantine/core';
 import type { EditorInstance, EditorPreferences, EditorSelectionSnapshot, EditorState } from '@drawmotive/editor';
 import { callModel, projectSelection, selectionEdit, setModel, themeValue } from './selection-model.js';
 import type { SelectionEdit, UiSelection } from './selection-model.js';
@@ -61,6 +61,40 @@ function EditorUiOwner(props: EditorUiProps) {
   if(controller.editor!==props.editor)throw new TypeError('UI controller belongs to a different editor');
   return <EditorUiSession {...props} controller={controller}/>;
 }
+
+/** Native reports release timing and completion. The optional overlay owns the display delay. */
+function ObjectDropLayoutStatus({ editor, container }: Pick<EditorUiProps, 'editor' | 'container'>) {
+  const [visible, setVisible] = useState(false);
+  useLayoutEffect(() => {
+    setVisible(false);
+    if (editor.lifecycle !== 'ready') return;
+    const eventName = 'drawmotive:object-drop-layout';
+    const win = container.ownerDocument.defaultView!;
+    let timer: number | undefined;
+
+    function update(event: Event) {
+      const elapsed: unknown = (event as CustomEvent).detail;
+      if (elapsed !== null && (typeof elapsed !== 'number' || !Number.isFinite(elapsed))) return;
+      win.clearTimeout(timer);
+      const delay = elapsed === null ? null : Math.max(0, 500 - elapsed);
+      setVisible(delay === 0);
+      if (delay !== null && delay > 0) timer = win.setTimeout(() => setVisible(true), delay);
+    }
+
+    function detach() {
+      win.clearTimeout(timer);
+      container.removeEventListener(eventName, update);
+    }
+    container.addEventListener(eventName, update);
+    const stop = editor.onEvent('disposing', () => { detach(); setVisible(false); });
+    return () => { stop(); detach(); };
+  }, [container, editor]);
+
+  return visible && <div className="dm-object-drop-layout" role="status" aria-label="Updating layout" data-testid="object-drop-layout">
+    <Loader size={18} color="var(--dm-text)"/>
+  </div>;
+}
+
 function EditorUiSession({editor,controller,container,slots={},colorScheme,className='',style,onError}:EditorUiProps & {controller:EditorUiController}) {
   const [ui,setUi]=useState(controller.ui),[state,setState]=useState<EditorState>(idle),[selection,setSelection]=useState<UiSelection|null>(null);
   const [preferences,setPreferences]=useState<EditorPreferences>({}),[panel,setPanel]=useState<string|null>(null),[error,setError]=useState<unknown>(null);
@@ -203,6 +237,7 @@ function EditorUiSession({editor,controller,container,slots={},colorScheme,class
     <MantineThemeProvider inherit={false}>
     <MantineProvider forceColorScheme={scheme} theme={mergeThemeOverrides(phosphorTheme,tooltipTheme(scheme==='dark'),fontFamily?{fontFamily,headings:{fontFamily}}:{})} cssVariablesSelector=".dm-editor-ui" getRootElement={()=>overlay.current??undefined}>
       <UiContext.Provider value={context}>
+        <ObjectDropLayoutStatus editor={editor} container={container}/>
         {Object.entries(ui.regions).map(([id,region])=>{const children=region.items.map(regionItem).filter(Boolean);return region.visible&&children.length>0?<ToolbarTooltipPosition.Provider key={id} value={id.startsWith('top')?'bottom':'top'}><div className={'dm-toolbar dm-corner dm-'+id} role="toolbar" aria-label={id+' toolbar'} data-region={id}>{children}</div></ToolbarTooltipPosition.Provider>:null;})}
         {ui.drawingToolbar.visible&&ui.drawingToolbar.tools.some(id=>ui.buttons[id])&&<ToolbarTooltipPosition.Provider value={({left:'right',right:'left',top:'bottom',bottom:'top'} as const)[ui.drawingToolbar.position]}><fieldset className={'dm-toolbar dm-drawing dm-'+ui.drawingToolbar.position} disabled={editingBlocked} aria-label="Drawing tools" data-testid="drawing-toolbar">{ui.drawingToolbar.tools.map(builtin)}</fieldset></ToolbarTooltipPosition.Provider>}
         <CreationTooltip container={container}/>
